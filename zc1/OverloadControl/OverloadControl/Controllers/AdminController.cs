@@ -174,38 +174,32 @@ namespace OverloadControl.Controllers
         }
 
         /// <summary>
-        /// 更新工作人员信息
+        /// 修改工作人员信息
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="updatedPolice"></param>
+        /// <param name="name"></param>
+        /// <param name="sex"></param>
+        /// <param name="password"></param>
+        /// <param name="phone"></param>
+        /// <param name="age"></param>
         /// <returns></returns>
-        [HttpPut]
-        public string PutPolice([FromBody] Police updatedPolice)
-        {
-            using (var context = new OCDbContext())
-            {
-                if (updatedPolice != null)
-                {
-                    var existingPolice = GetPoliceById(updatedPolice.Id);
-                    if (existingPolice != null)
-                    {
-                        // 根据传入的 updatedPolice 对象更新现有 Police 对象的信息
-                        existingPolice.Account = updatedPolice.Account;
-                        existingPolice.Password = updatedPolice.Password;
-                        existingPolice.Phone = updatedPolice.Phone;
-                        existingPolice.Name = updatedPolice.Name;
-                        existingPolice.Age = updatedPolice.Age;
-                        existingPolice.Sex = updatedPolice.Sex;
 
-                        // 保存对 Police 对象的更新操作，这里可以是将更新后的信息保存至数据库或内存中
-                        // 例如：context.SaveChanges() 或者更新内存中的数据集
-                        context.SaveChanges();
-                        return "Police 信息更新成功！";
-                    }
-                    return "未找到对应的 Police 对象，请检查输入的 Id。";
-                }
-                return "传入的更新对象为空，请检查传入的参数。";
+        [HttpPut("UpdatePolice/{id}")]
+        public IActionResult UpdatePolice(int id, [FromBody] string name, string sex, string password, string phone, int age)
+        {
+            var police = m_AdminContext.Polices.FirstOrDefault(l => l.Id == id);
+            if (police == null)
+            {
+                return NotFound();
             }
+            police.Age = age;
+            police.Sex = sex;
+            police.Name = name;
+            police.Password = password;
+            police.Phone = phone;
+            m_AdminContext.Entry(police).State = EntityState.Modified;
+            m_AdminContext.SaveChanges();
+            return NoContent();
         }
 
         /// <summary>
@@ -482,20 +476,61 @@ namespace OverloadControl.Controllers
         #region 法律管理
 
         /// <summary>
-        /// 增加法律条文
+        /// 根据法律类型来添加法律条文
         /// </summary>
+        /// <param name="LawTypeId"></param>
         /// <param name="content"></param>
         /// <returns></returns>
         [HttpPost]
-        public bool AddLaw(string content)
+        public IActionResult AddLaw1(int LawTypeId, string content)
+        {
+            // 首先检查指定的 LawType 是否存在
+            LawType lawType = m_AdminContext.lawTypes.FirstOrDefault(lt => lt.Id == LawTypeId);
+            if (lawType == null)
+            {
+                return NotFound(); // 返回 404 Not Found
+            }
+
+            // 创建 Law 对象并设置相关属性
+            Law law = new Law()
+            {
+                Content = content
+            };
+
+            // 将 Law 对象保存到数据库
+            m_AdminContext.Laws.Add(law);
+            m_AdminContext.SaveChanges();
+
+            // 创建 Law_LawType 对象并设置相关属性
+            Law_LawType law_LawType = new Law_LawType()
+            {
+                LawTypeId = LawTypeId,
+                LawId = law.Id
+            };
+
+            // 将 Law_LawType 对象保存到数据库
+            m_AdminContext.law_LawTypes.Add(law_LawType);
+            m_AdminContext.SaveChanges();
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// 增加法律类型
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+
+        [HttpPost]
+        public bool AddLawType(string content)
         {
             if (!string.IsNullOrEmpty(content))
             {
-                Law law = new Law()
+                LawType lawType = new LawType()
                 {
-                    Content = content
+                    Name = content
                 };
-                m_AdminContext.Laws.Add(law);
+                m_AdminContext.lawTypes.Add(lawType);
                 m_AdminContext.SaveChanges();
             }
             return true;
@@ -526,45 +561,6 @@ namespace OverloadControl.Controllers
         }
 
         /// <summary>
-        /// 添加法律
-        /// </summary>
-        /// <param name="lawTypeId"></param>
-        /// <param name="law"></param>
-        /// <returns></returns>
-
-        [HttpPost]
-        public IActionResult AddLawByLawType(int lawTypeId, [FromBody] Law law)
-        {
-            // 首先检查指定的 LawType 是否存在
-            LawType lawType = m_AdminContext.lawTypes.FirstOrDefault(lt => lt.Id == lawTypeId);
-            if (lawType == null)
-            {
-                return NotFound(); // 返回 404 Not Found
-            }
-
-            // 创建 Law 对象并设置相关属性
-            Law newLaw = new Law()
-            {
-                Content = law.Content,
-                law_Cases = law.law_Cases,
-                law_LawTypes = new List<Law_LawType>()
-        {
-            new Law_LawType()
-            {
-                lawType = lawType
-            }
-        }
-            };
-
-            // 保存 Law 对象到数据库
-            m_AdminContext.Laws.Add(newLaw);
-            m_AdminContext.SaveChanges();
-
-            // 返回成功添加的 Law 对象
-            return CreatedAtAction(nameof(GetLawById), new { id = newLaw.Id }, newLaw);
-        }
-
-        /// <summary>
         /// 通过Id查找法律
         /// </summary>
         /// <param name="id"></param>
@@ -586,33 +582,58 @@ namespace OverloadControl.Controllers
             return Ok(law);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> PutLaw(Law law)
-        {
-            //if (id != law.Id)
-            //{
-            //    return BadRequest();
-            //}
+        /// <summary>
+        /// 修改法律
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="newContent"></param>
+        /// <returns></returns>
 
+        [HttpPut("updatecontent/{id}")]
+        public IActionResult UpdateLawContent(int id, [FromBody] string newContent)
+        {
+            // 查找要修改的 Law 对象
+            var law = m_AdminContext.Laws.FirstOrDefault(l => l.Id == id);
+            if (law == null)
+            {
+                return NotFound(); // 如果找不到对应的 Law 对象，则返回 404 Not Found
+            }
+
+            // 更新 Law 对象的 Content 属性
+            law.Content = newContent;
+
+            // 将实体标记为已修改状态
             m_AdminContext.Entry(law).State = EntityState.Modified;
 
-            try
+            // 保存更改到数据库
+            m_AdminContext.SaveChanges();
+
+            return NoContent(); // 返回 204 No Content 表示成功更新
+        }
+
+        /// <summary>
+        /// 修改法律类型
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="updatedLawType"></param>
+        /// <returns></returns>
+        [HttpPut("update/{id}")]
+        public IActionResult UpdateLawType(int id, [FromBody] string updatedLawType)
+        {
+            // 查找要修改的 LawType 对象
+            var lawType = m_AdminContext.lawTypes.FirstOrDefault(lt => lt.Id == id);
+            if (lawType == null)
             {
-                await m_AdminContext.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LawExists(law.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(); // 如果找不到对应的 LawType 对象，则返回 404 Not Found
             }
 
-            return NoContent();
+            lawType.Name = updatedLawType;
+            m_AdminContext.Entry(lawType).State = EntityState.Modified;
+
+            // 保存更改到数据库
+            m_AdminContext.SaveChanges();
+
+            return Ok(lawType); // 返回修改后的 LawType 对象
         }
 
         /// <summary>

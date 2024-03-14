@@ -10,10 +10,12 @@ namespace OverloadControl.Controllers
     public class BackendControlr : ControllerBase
     {
         private static OverloadControl.DataAccessor.OCDbContext m_OCDbContext;
+
         public BackendControlr(OverloadControl.DataAccessor.OCDbContext oCDbContext)
         {
             m_OCDbContext = oCDbContext;
         }
+
         /// <summary>
         /// 查询对应案件处理人员的案件单
         /// </summary>
@@ -30,12 +32,31 @@ namespace OverloadControl.Controllers
             return JsonConvert.SerializeObject(cases);
         }
 
-
         /// <summary>
-        /// 查询案件对应的案件处理人员
+        /// 修改个人信息
         /// </summary>
-        /// <param name="caseId"></param>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <param name="password"></param>
+        /// <param name="phone"></param>
         /// <returns></returns>
+
+        [HttpPut("UpdatePolice/{id}")]
+        public IActionResult UpdatePolice(int id, [FromBody] string name, string password, string phone)
+        {
+            var police = m_OCDbContext.Polices.FirstOrDefault(l => l.Id == id);
+            if (police == null)
+            {
+                return NotFound();
+            }
+
+            police.Name = name;
+            police.Password = password;
+            police.Phone = phone;
+            m_OCDbContext.Entry(police).State = EntityState.Modified;
+            m_OCDbContext.SaveChanges();
+            return NoContent();
+        }
 
         /// <summary>
         /// 查询案件对应的案件处理人员
@@ -70,7 +91,7 @@ namespace OverloadControl.Controllers
         /// <param name="content"></param>
         /// <returns></returns>
         [HttpPut]
-        public bool handleCase(string caseId, string content,string content1)
+        public bool handleCase(string caseId, string content, string content1)
         {
             var item = m_OCDbContext.Cases.Where(c => c.Id == int.Parse(caseId)).FirstOrDefault();
             if (item == null)
@@ -86,9 +107,7 @@ namespace OverloadControl.Controllers
                 m_OCDbContext.SaveChanges();
             }
             return true;
-
         }
-
 
         /// <summary>
         /// 根据法律类型查找法律
@@ -104,8 +123,6 @@ namespace OverloadControl.Controllers
                        select b;
             return JsonConvert.SerializeObject(laws);
         }
-
-
 
         /// <summary>
         /// 添加案件跟进度表的关系
@@ -132,7 +149,6 @@ namespace OverloadControl.Controllers
             return true;
         }
 
-
         /// <summary>
         /// 添加案件与法律的关系
         /// </summary>
@@ -141,10 +157,10 @@ namespace OverloadControl.Controllers
         /// <returns></returns>
 
         [HttpPost]
-        public bool AddCaseLaw(int caseId,int lawId)
+        public bool AddCaseLaw(int caseId, int lawId)
         {
             var item = m_OCDbContext.law_Cases.Where(c => c.CaseId == caseId && c.LawId == lawId).FirstOrDefault();
-            if(item !=null)
+            if (item != null)
             {
                 return false;
             }
@@ -155,8 +171,6 @@ namespace OverloadControl.Controllers
             m_OCDbContext.SaveChanges();
             return true;
         }
-
-
 
         /// <summary>
         /// 保存立案情况
@@ -184,7 +198,7 @@ namespace OverloadControl.Controllers
                 }
 
                 cases.M_Content = m_Content;
-                
+
                 m_OCDbContext.SaveChanges();
                 return true;
             }

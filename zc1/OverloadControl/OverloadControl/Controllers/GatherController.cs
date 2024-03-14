@@ -12,6 +12,7 @@ namespace OverloadControl.Controllers
     public class GatherController : ControllerBase
     {
         private static OverloadControl.DataAccessor.OCDbContext m_OCDbContext;
+
         public GatherController(OverloadControl.DataAccessor.OCDbContext oCDbContext)
         {
             m_OCDbContext = oCDbContext;
@@ -48,8 +49,6 @@ namespace OverloadControl.Controllers
             return JsonConvert.SerializeObject(query);
         }
 
-
-
         /// <summary>
         /// 提交案件申请
         /// </summary>
@@ -77,7 +76,6 @@ namespace OverloadControl.Controllers
                         cases.Image = $"{now.Ticks}{fs.Extension}";
                         if (SaveCase(cases))
                         {
-
                             if (!System.IO.Directory.Exists(dir))
                             {
                                 System.IO.Directory.CreateDirectory(dir);
@@ -98,11 +96,35 @@ namespace OverloadControl.Controllers
                         }
                     }
                 }
-
             }
             return "";
         }
 
+        /// <summary>
+        /// 修改个人信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <param name="password"></param>
+        /// <param name="phone"></param>
+        /// <returns></returns>
+
+        [HttpPut("UpdatePolice/{id}")]
+        public IActionResult UpdatePolice(int id, [FromBody] string name, string password, string phone)
+        {
+            var police = m_OCDbContext.Polices.FirstOrDefault(l => l.Id == id);
+            if (police == null)
+            {
+                return NotFound();
+            }
+
+            police.Name = name;
+            police.Password = password;
+            police.Phone = phone;
+            m_OCDbContext.Entry(police).State = EntityState.Modified;
+            m_OCDbContext.SaveChanges();
+            return NoContent();
+        }
 
         /// <summary>
         /// 查询案件进度
@@ -121,12 +143,10 @@ namespace OverloadControl.Controllers
                             progressName = p.ProgressName,
                             time = o.Time,
                             content = o._Content
-
                         };
             var progressList = JsonConvert.SerializeObject(query);
             return progressList;
         }
-
 
         /// <summary>
         /// 保存案件进度关系
@@ -135,7 +155,6 @@ namespace OverloadControl.Controllers
         /// <param name="progressId"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-
 
         [HttpPost]
         private bool AddCaseProgress(int caseId, int progressId, string content)
@@ -162,6 +181,7 @@ namespace OverloadControl.Controllers
             m_OCDbContext.SaveChanges();
             return true;
         }
+
         /// <summary>
         /// 添加信息采集人员与案件的关系
         /// </summary>
@@ -191,9 +211,6 @@ namespace OverloadControl.Controllers
             }
             return false;
         }
-
-
-
 
         /// <summary>
         /// 根据案件状态查询案件
@@ -234,10 +251,7 @@ namespace OverloadControl.Controllers
                 m_OCDbContext.SaveChanges();
             }
             return true;
-
         }
-
-
 
         /// <summary>
         /// 根据PoliceId，CaseId和ProgressId查询Case
@@ -278,6 +292,4 @@ namespace OverloadControl.Controllers
             return requestedCase;
         }
     }
-
 }
-
