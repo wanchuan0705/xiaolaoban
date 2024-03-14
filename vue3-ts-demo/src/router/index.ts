@@ -6,17 +6,17 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "home",
     component: HomeView,
-    redirect: "user", //设置重定向
+    redirect: "caseStatistics", //设置重定向
     children: [
       {
-        path: "goods",
-        name: "goods",
+        path: "caseStatistics",
+        name: "caseStatistics",
         meta: {
-          isShow: false,
-          title: "商品列表",
+          isShow: true,
+          title: "案件统计",
         },
         component: () =>
-          import(/* webpackChunkName: "goods" */ "../views/GoodsView.vue"),
+          import("../views/CaseStatistics.vue"),
       },
       {
         path: "user",

@@ -32,5 +32,6 @@ module.exports = {
     ],
     "rules": {
         'no-debugger': 0, // 允许使用 debugger 语句
+        "vue/multi-word-component-names": "off",
     }
 }

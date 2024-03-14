@@ -56,7 +56,7 @@
     </el-dialog>
 </template>
 
-<script lang="ts">
+<script lang="ts" >
 import axios from "axios";
 import { ElNotification } from "element-plus";
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from "vue";
