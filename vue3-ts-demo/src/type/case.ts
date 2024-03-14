@@ -1,22 +1,27 @@
 export interface ListInt {
-  Id: number;
-  Address: string;
-  Details: string;
-  Types: string;
-  Platenumber: string;
-  Date: Date;
-  Phone: string;
-  Image: string;
-  PolicerName: string;
-  State: string;
-  ViolatorsName: string;
-  ApplicationTime: string;
-  Description: string;
-  Model: string;
-  Judgment: string;
-  M_Conten: string;
-  PolicerName1: string;
-  ViolatorsPhone: string;
+  CaseNo: string;
+Id: number;
+Address: string;
+Types: string;
+Details: string;
+Platenumber: string;
+Date: Date;
+Phone: string;
+Image: string;
+PolicerName: string;
+State: string;
+ViolatorsName: string;
+ApplicationTime: string;
+Description: string;
+Model: string;
+Judgment: string;
+M_Content: string;
+Content: string;
+PolicerName1: string;
+ViolatorsPhone: string;
+OrderTake: string;
+LegalArticles: string;
+
 }
 interface SelectDataInt {
   status: string;
@@ -25,24 +30,29 @@ interface SelectDataInt {
   pagesize: number; //默认一页显示几条
 }
 interface ActiveInt {
-  Id: number;
-  Address: string;
-  Details: string;
-  Types: string;
-  Platenumber: string;
-  Date: Date;
-  Phone: string;
-  Image: string;
-  PolicerName: string;
-  State: string;
-  ViolatorsName: string;
-  ApplicationTime: string;
-  Description: string;
-  Model: string;
-  Judgment: string;
-  M_Conten: string;
-  PolicerName1: string;
-  ViolatorsPhone: string;
+   CaseNo: string;
+Id: number;
+Address: string;
+Types: string;
+Details: string;
+Platenumber: string;
+Date: Date;
+Phone: string;
+Image: string;
+PolicerName: string;
+State: string;
+ViolatorsName: string;
+ApplicationTime: string;
+Description: string;
+Model: string;
+Judgment: string;
+M_Content: string;
+Content: string;
+PolicerName1: string;
+ViolatorsPhone: string;
+OrderTake: string;
+LegalArticles: string;
+
 }
 export class InitData {
   selectData: SelectDataInt = {
@@ -55,24 +65,27 @@ export class InitData {
   isShow = false;
   isAddShow = false;
   active: ActiveInt = {
-    //选中的对象
+   CaseNo:"",
     Id: 0,
-    Address: "",
-    Details: "",
-    Types: "",
-    Platenumber: "",
-    Date: new Date(), // 默认为当前时间
-    Phone: "",
-    Image: "",
-    PolicerName: "",
-    State: "",
-    ViolatorsName: "",
-    ApplicationTime: "",
-    Description: "",
-    Model: "",
-    Judgment: "",
-    M_Conten: "",
-    PolicerName1: "",
-    ViolatorsPhone: "",
+  Address: "",
+  Types: "",
+  Details: "",
+  Platenumber: "",
+  Date: new Date(),
+  Phone: "",
+  Image: "",
+  PolicerName: "",
+  State: "",
+  ViolatorsName: "",
+  ApplicationTime: "",
+  Description: "",
+  Model: "",
+  Judgment: "",
+  M_Content: "",
+  Content: "",
+  PolicerName1: "",
+  ViolatorsPhone: "",
+  OrderTake: "",
+  LegalArticles: ""
   };
 }

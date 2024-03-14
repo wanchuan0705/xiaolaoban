@@ -1,6 +1,5 @@
 export interface ListInt {
   Id: number;
-  Directory: string;
   Content: string;
 }
 interface SelectDataInt {
@@ -8,10 +7,10 @@ interface SelectDataInt {
   page: number; //页码
   count: number; //总条数
   pagesize: number; //默认一页显示几条
+  Id:number
 }
 interface ActiveInt {
   Id: number;
-  Directory: string;
   Content: string;
 }
 export class InitData {
@@ -20,6 +19,7 @@ export class InitData {
     page: 1,
     count: 0,
     pagesize: 5,
+    Id: 0,
   };
   list: ListInt[] = []; //用来接受用户信息的列表
   isShow = false;
@@ -27,7 +27,6 @@ export class InitData {
   active: ActiveInt = {
     //选中的对象
     Id: 0,
-    Directory: "",
     Content: "",
   };
 }

@@ -25,7 +25,7 @@ namespace OverloadControl.Controllers
         /// <returns></returns>
 
         [HttpPost("SaveCase")]
-        public bool SaveCase(Case cases)
+        public bool SaveCase([FromBody]Case cases)
         {
             if (cases != null)
             {

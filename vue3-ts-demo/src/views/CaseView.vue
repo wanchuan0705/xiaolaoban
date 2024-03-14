@@ -10,38 +10,45 @@
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="onSubmit">查询</el-button>
+                <el-button type="primary" @click="onSubmit" icon="search">查询</el-button>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="addClick">新增</el-button>
+                <el-button type="primary" @click="addClick"><el-icon>
+                        <CirclePlus />
+                    </el-icon>新增</el-button>
             </el-form-item>
         </el-form>
         <el-table :data="dataList.comList" border style="width: 100%">
-            <el-table-column prop="Id" label="ID" width="180" />
-            <el-table-column prop="Address" label="Address" width="180" />
-            <el-table-column prop="Types" label="Types" width="180" />
-            <el-table-column prop="Details" label="Details" width="180" />
-            <el-table-column prop="Platenumber" label="Platenumber" width="180" />
-            <el-table-column prop="Date" label="Date" width="180" />
-            <el-table-column prop="Phone" label="Phone" width="180" />
-            <el-table-column prop="Image" label="Image" width="180" />
-            <el-table-column prop="PolicerName" label="PolicerName" width="180" />
-            <el-table-column prop="State" label="State" width="180" />
-            <el-table-column prop="ViolatorsName" label="v" width="180" />
-            <el-table-column prop="ApplicationTime" label="ApplicationTime" width="180" />
-            <el-table-column prop="Description" label="Description" width="180" />
-            <el-table-column prop="Model" label="Model" width="180" />
-            <el-table-column prop="Judgment" label="Judgment" width="180" />
-            <el-table-column prop="M_Conten" label="M_Conten" width="180" />
-            <el-table-column prop="PolicerName1" label="PolicerName1" width="180" />
-            <el-table-column prop="ViolatorsPhone" label="ViolatorsPhone" width="180" />
             <el-table-column label="操作">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click="changeUser(scope.row)">
+                    <el-button link type="primary" icon="edit" size="small" @click="changeUser(scope.row)">
                         编辑
                     </el-button>
                 </template>
             </el-table-column>
+            <el-table-column prop="Id" label="ID" />
+            <el-table-column prop="CaseNo" label="CaseNo" />
+            <el-table-column prop="Address" label="Address" />
+            <el-table-column prop="Types" label="Types" />
+            <el-table-column prop="Details" label="Details" />
+            <el-table-column prop="Platenumber" label="Platenumber" />
+            <el-table-column prop="Date" label="Date" />
+            <el-table-column prop="Phone" label="Phone" />
+            <el-table-column prop="Image" label="Image" />
+            <el-table-column prop="PolicerName" label="PolicerName" />
+            <el-table-column prop="State" label="State" />
+            <el-table-column prop="ViolatorsName" label="ViolatorsName" />
+            <el-table-column prop="ApplicationTime" label="ApplicationTime" />
+            <el-table-column prop="Description" label="Description" />
+            <el-table-column prop="Model" label="Model" />
+            <el-table-column prop="Judgment" label="Judgment" />
+            <el-table-column prop="M_Conten" label="M_Conten" />
+            <el-table-column prop="PolicerName1" label="PolicerName1" />
+            <el-table-column prop="ViolatorsPhone" label="ViolatorsPhone" />
+            <el-table-column prop="OrderTake" label="OrderTake" />
+            <el-table-column prop="LegalArticles" label="LegalArticles" />
+
+
         </el-table>
         <el-pagination @current-change="currentChange" @size-change="sizeChange" layout="prev, pager, next"
             :total="selectData.count * 2" />
@@ -96,7 +103,7 @@
                 <el-input v-model="active.Judgment" autocomplete="off" />
             </el-form-item>
             <el-form-item label="M_Conten" label-width="50px">
-                <el-input v-model="active.M_Conten" autocomplete="off" />
+                <el-input v-model="active.M_Content" autocomplete="off" />
             </el-form-item>
             <el-form-item label="PolicerName1" label-width="50px">
                 <el-input v-model="active.PolicerName1" autocomplete="off" />
@@ -161,14 +168,24 @@
             <el-form-item label="Judgment" label-width="50px">
                 <el-input v-model="active.Judgment" autocomplete="off" />
             </el-form-item>
-            <el-form-item label="M_Conten" label-width="50px">
-                <el-input v-model="active.M_Conten" autocomplete="off" />
+            <el-form-item label="M_Content" label-width="50px">
+                <el-input v-model="active.M_Content" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="Content" label-width="50px">
+                <el-input v-model="active.Content" autocomplete="off" />
             </el-form-item>
             <el-form-item label="PolicerName1" label-width="50px">
                 <el-input v-model="active.PolicerName1" autocomplete="off" />
             </el-form-item>
             <el-form-item label="ViolatorsPhone" label-width="50px">
                 <el-input v-model="active.ViolatorsPhone" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="OrderTake" label-width="50px">
+                <el-input v-model="active.OrderTake" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="LegalArticles" label-width="50px">
+                <el-input v-model="active.LegalArticles" autocomplete="off" />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -193,13 +210,13 @@ export default defineComponent({
         });
         const getCase = async () => {
             try {
-                const res = await axios.get('https://console-mock.apipost.cn/mock/e2291285-0895-4edf-95ea-855e14b04157/?apipost_id=c6d16f');
+                const res = await axios.get('http://localhost:5172/api/Admin/GetCases');
                 // 处理响应
                 console.log(res.data); // 假设响应返回数据
                 if (res && res.data) {
                     // 确保 res 和 res.data 都存在
-                    data.list = res.data.data;
-                    data.selectData.count = res.data.data.length;
+                    data.list = res.data;
+                    data.selectData.count = res.data.length;
                     console.log(data.list);
                 }
             } catch (error) {
@@ -223,12 +240,13 @@ export default defineComponent({
         const addClick = () => {
             data.isAddShow = true; // 更新 isAddShow 的值
             data.active = {
+                CaseNo: "",
                 Id: 0,
                 Address: "",
-                Details: "",
                 Types: "",
+                Details: "",
                 Platenumber: "",
-                Date: new Date(), // 默认为当前时间
+                Date: new Date(),
                 Phone: "",
                 Image: "",
                 PolicerName: "",
@@ -238,9 +256,12 @@ export default defineComponent({
                 Description: "",
                 Model: "",
                 Judgment: "",
-                M_Conten: "",
+                M_Content: "",
+                Content: "",
                 PolicerName1: "",
                 ViolatorsPhone: "",
+                OrderTake: "",
+                LegalArticles: ""
             };
         };
         const onSubmit = () => {
@@ -273,6 +294,7 @@ export default defineComponent({
         const changeUser = (row: ListInt) => {
             console.log(row);
             data.active = {
+                CaseNo: row.CaseNo,
                 Id: row.Id,
                 Address: row.Address,
                 Details: row.Details,
@@ -288,9 +310,13 @@ export default defineComponent({
                 Description: row.Description,
                 Model: row.Model,
                 Judgment: row.Judgment,
-                M_Conten: row.M_Conten,
+                M_Content: row.M_Content,
+                Content:row.Content,
                 PolicerName1: row.PolicerName1,
                 ViolatorsPhone: row.ViolatorsPhone,
+                OrderTake: row.OrderTake, // 补充 OrderTake
+                LegalArticles: row.LegalArticles // 补充 LegalArticles
+
             }
             data.isShow = true
 
@@ -298,6 +324,7 @@ export default defineComponent({
         const updateUser = () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let obj: any = data.list.find((value) => value.Id == data.active.Id)
+            obj.CaseNo = data.active.CaseNo
             obj.Address = data.active.Address
             obj.Details = data.active.Details
             obj.Types = data.active.Types
@@ -312,9 +339,12 @@ export default defineComponent({
             obj.Description = data.active.Description
             obj.Model = data.active.Model
             obj.Judgment = data.active.Judgment
-            obj.M_Conten = data.active.M_Conten
+            obj.M_Conten = data.active.M_Content
+            obj.Content = data.active.Content
             obj.PolicerName1 = data.active.PolicerName1
             obj.ViolatorsPhone = data.active.ViolatorsPhone
+            obj.OrderTake = data.active.OrderTake
+            obj.LegalArticles = data.active.LegalArticles
             console.log(obj);
             data.list.forEach((item, i) => {
                 if (item.Id == obj.id) {
@@ -330,6 +360,7 @@ export default defineComponent({
         }
         const addUser = () => {
             data.list.push(data.active)
+            
             data.isAddShow = false,
                 ElNotification.success({
                     title: '已完成',

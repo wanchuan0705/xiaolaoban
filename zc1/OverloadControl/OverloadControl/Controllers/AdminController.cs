@@ -522,13 +522,13 @@ namespace OverloadControl.Controllers
         /// <returns></returns>
 
         [HttpPost]
-        public bool AddLawType(string content)
+        public bool AddLawType(string Name)
         {
-            if (!string.IsNullOrEmpty(content))
+            if (!string.IsNullOrEmpty(Name))
             {
                 LawType lawType = new LawType()
                 {
-                    Name = content
+                    Name = Name
                 };
                 m_AdminContext.lawTypes.Add(lawType);
                 m_AdminContext.SaveChanges();
@@ -589,8 +589,8 @@ namespace OverloadControl.Controllers
         /// <param name="newContent"></param>
         /// <returns></returns>
 
-        [HttpPut("updatecontent/{id}")]
-        public IActionResult UpdateLawContent(int id, [FromBody] string newContent)
+        [HttpPut]
+        public IActionResult UpdateLawContent(int id,  string newContent)
         {
             // 查找要修改的 Law 对象
             var law = m_AdminContext.Laws.FirstOrDefault(l => l.Id == id);

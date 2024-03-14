@@ -5,10 +5,12 @@
                 <el-input v-model="selectData.Directory" placeholder="请输入名称" clearable />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="onSubmit">查询</el-button>
+                <el-button type="primary" @click="onSubmit" icon="search">查询</el-button>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="addClick">新增</el-button>
+                <el-button type="primary" @click="addClick"><el-icon>
+                        <CirclePlus />
+                    </el-icon>新增</el-button>
             </el-form-item>
         </el-form>
         <el-table :data="dataList.comList" border style="width: 100%">
@@ -16,12 +18,12 @@
             <el-table-column prop="Name" label="名称" />
             <el-table-column label="操作">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click="changeUser(scope.row)">
+                    <el-button link type="primary" size="small" @click="changeUser(scope.row)" icon="edit">
                         编辑
                     </el-button>
-                    <el-button link type="primary" size="small" @click="changeUser(scope.row)">
+                    <!-- <el-button link type="primary" size="small" @click="changeUser(scope.row)">
                         删除
-                    </el-button>
+                    </el-button> -->
                 </template>
             </el-table-column>
         </el-table>
@@ -30,13 +32,13 @@
     </div>
     <el-dialog v-model="isAddShow" title="新增信息">
         <el-form :model="active">
-            <el-form-item label="Name" label-width="50px">
-                <el-input v-model="active.Content" autocomplete="off" />
+            <el-form-item label="名称" label-width="50px">
+                <el-input v-model="active.Name" autocomplete="off" />
             </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="addUser">新增</el-button>
+                <el-button @click="addUser"><el-icon><Select /></el-icon>新增</el-button>
                 <el-button type="primary" @click="isAddShow = false">取消</el-button>
             </span>
         </template>
@@ -49,7 +51,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="updateUser">更改</el-button>
+                <el-button @click="updateUser"><el-icon><Select /></el-icon>更改</el-button>
                 <el-button type="primary" @click="isShow = false">取消</el-button>
             </span>
         </template>
@@ -164,9 +166,10 @@ export default defineComponent({
                     offset: 100,
                 })
         }
-        const addUser = () => {
+        const addUser = async () => {
             data.list.push(data.active)
-            data.isAddShow = false,
+            data.isAddShow = false; 
+            await axios.post(`http://localhost:5172/api/Admin/AddLawType?Name=${data.active.Name}`);
                 ElNotification.success({
                     title: '已完成',
                     message: '添加成功',
