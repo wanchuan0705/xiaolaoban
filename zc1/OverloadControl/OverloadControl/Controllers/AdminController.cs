@@ -335,6 +335,22 @@ namespace OverloadControl.Controllers
         }
 
         /// <summary>
+        /// 根据案件状态查询案件
+        /// </summary>
+        /// <param name="PreId"></param>
+        /// <returns></returns>
+
+        [HttpGet]
+        public string GetCaseByProgress(int PreId)
+        {
+            var cases = from o in m_AdminContext.Case_Progresses
+                        join b in m_AdminContext.Cases on o.CaseId equals b.Id
+                        where o.ProgressId == PreId && o.HistoryState == 0
+                        select b;
+            return JsonConvert.SerializeObject(cases);
+        }
+
+        /// <summary>
         /// 添加案件-进度关系
         /// </summary>
         /// <param name = "bxOrderId" ></ param >
@@ -344,17 +360,23 @@ namespace OverloadControl.Controllers
         [HttpPost]
         public bool AddCaseProgress(int caseId, int progressId, string content)
         {
-            var item = m_AdminContext.Case_Progresses.Where(c => c.CaseId == caseId && c.ProgressId == progressId).FirstOrDefault();
-            if (item != null)
+            var existingProgressList = m_AdminContext.Case_Progresses.Where(cp => cp.CaseId == caseId && cp.HistoryState == 0).ToList();
+
+            if (existingProgressList.Any())
             {
-                return false;
+                foreach (var item in existingProgressList)
+                {
+                    item.HistoryState = 1;//改为历史状态
+                }
             }
-            Case_Progress case_Progress = new Case_Progress();
-            case_Progress.CaseId = caseId;
-            case_Progress.ProgressId = progressId;
-            case_Progress.Time = DateTime.Now.ToString();
-            case_Progress._Content = content;
-            m_AdminContext.Case_Progresses.Add(case_Progress);
+            // Add new progress
+            Case_Progress caseProgress = new Case_Progress();
+            caseProgress.CaseId = caseId;
+            caseProgress.ProgressId = progressId;
+            caseProgress.Time = DateTime.Now.ToString();
+            caseProgress._Content = content;
+            caseProgress.HistoryState = 0;
+            m_AdminContext.Case_Progresses.Add(caseProgress);
             m_AdminContext.SaveChanges();
             return true;
         }
@@ -380,39 +402,29 @@ namespace OverloadControl.Controllers
         /// < param name="index"></param>
         /// <returns></returns>
         [HttpPost]
-        public bool AddMaintainer(string caseId, string content, string police, string index)
+        public bool AddPoliceCase(int caseId, string content, int policeId)
         {
-            //查询工作人员的id
-
-            var query = (from o in m_AdminContext.Police_Roles
-                         join r in m_AdminContext.Roles on o.RoleId equals r.Id
-                         join u in m_AdminContext.Polices on o.PoliceId equals u.Id
-                         where u.Name == police && r.Id == 2
-                         select u.Id).FirstOrDefault();
             //查询案件单
-            var cases = m_AdminContext.Cases.Where(c => c.Id == int.Parse(caseId)).FirstOrDefault();
+            var cases = m_AdminContext.Cases.Where(c => c.Id == caseId).FirstOrDefault();
+            var police = m_AdminContext.Polices.FirstOrDefault(c => c.Id == policeId);
 
             if (cases != null)
             {
-                if (query != 0 && cases != null && int.Parse(index) == 1)
+                if (policeId != 0 && cases != null)
                 {
                     //安排工作人员
                     Police_Case police_Case = new Police_Case();
-                    police_Case.PoliceId = query;
+                    police_Case.PoliceId = policeId;
                     police_Case.CaseId = cases.Id;
                     m_AdminContext.Police_Cases.Add(police_Case);
 
                     //修改案件单状态,添加案件进度
-                    cases.State = "已处理";
-                    AddCaseProgress(cases.Id, 4, content);
-                }
-
-                if (query != 0 && cases != null && int.Parse(index) == 2)
-                {
-                    //修改案件状态,添加案件进度
-                    cases.State = "已驳回";
+                    cases.State = "已受理";
+                    cases.OrderTake = "已受理";
+                    cases.PolicerName1 = police?.Name;
                     AddCaseProgress(cases.Id, 7, content);
                 }
+
                 m_AdminContext.SaveChanges();
                 return true;
             }
@@ -434,10 +446,11 @@ namespace OverloadControl.Controllers
             {
                 return false;
             }
-         ;
-            if (AddCaseProgress(item.Id, 6, content))
+    ;
+            if (AddCaseProgress(item.Id, 5, content))
             {
                 item.State = "已结案";
+                item.OrderTake = "已结案";
                 item.Content = content;
                 m_AdminContext.SaveChanges();
             }
@@ -469,6 +482,63 @@ namespace OverloadControl.Controllers
             var taskNum1 = list1.Count();
             int[] array = { taskNum, taskNum1 };
             return array;
+        }
+
+        /// <summary>
+        /// 案件审核通过
+        /// </summary>
+        /// <param name="caseId"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+
+        [HttpPut]
+        public bool ReviewRases(string caseId, int lawTypeId, string content)
+        {
+            var item = m_AdminContext.Cases.Where(c => c.Id == int.Parse(caseId)).FirstOrDefault();
+            var lawType = m_AdminContext.lawTypes.Where(c => c.Id == lawTypeId).FirstOrDefault();
+            if (item == null)
+            {
+                return false;
+            }
+
+            if (AddCaseProgress(item.Id, 2, content))
+            {
+                item.State = "已审核";
+                item.OrderTake = "已审核";
+                item.Content = content;
+                item.Types = lawType?.Name;
+                item.LawTypeId = lawTypeId;
+                m_AdminContext.SaveChanges();
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 案件审核不通过
+        /// </summary>
+        /// <param name="caseId"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+
+        [HttpPut]
+        public bool ReviewRases1(string caseId, string content)
+        {
+            var item = m_AdminContext.Cases.Where(c => c.Id == int.Parse(caseId)).FirstOrDefault();
+
+            if (item == null)
+            {
+                return false;
+            }
+
+            if (AddCaseProgress(item.Id, 8, content))
+            {
+                item.State = "已驳回";
+                item.OrderTake = "已驳回";
+                item.Content = content;
+
+                m_AdminContext.SaveChanges();
+            }
+            return true;
         }
 
         #endregion 案件管理
@@ -590,7 +660,7 @@ namespace OverloadControl.Controllers
         /// <returns></returns>
 
         [HttpPut]
-        public IActionResult UpdateLawContent(int id,  string newContent)
+        public IActionResult UpdateLawContent(int id, string newContent)
         {
             // 查找要修改的 Law 对象
             var law = m_AdminContext.Laws.FirstOrDefault(l => l.Id == id);

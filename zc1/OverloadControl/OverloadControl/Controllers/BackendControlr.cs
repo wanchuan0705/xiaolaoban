@@ -91,19 +91,21 @@ namespace OverloadControl.Controllers
         /// <param name="content"></param>
         /// <returns></returns>
         [HttpPut]
-        public bool handleCase(string caseId, string content, string content1)
+        public bool handleCase(string caseId, string lawId, string content, string content1)
         {
             var item = m_OCDbContext.Cases.Where(c => c.Id == int.Parse(caseId)).FirstOrDefault();
+            var law = m_OCDbContext.Laws.Where(c => c.Id == int.Parse(lawId)).FirstOrDefault();
             if (item == null)
             {
                 return false;
             }
-          ;
-            if (AddCaseProgress(item.Id, 5, content))
+            if (AddCaseProgress(item.Id, 5, content) && AddCaseLaw(int.Parse(caseId), int.Parse(lawId)))
             {
                 item.State = "已完成";
                 item.LegalArticles = content1;
+                item.OrderTake = "已完成";
                 item.Judgment = content;
+                item.LegalArticles = law?.Content;
                 m_OCDbContext.SaveChanges();
             }
             return true;
@@ -134,17 +136,23 @@ namespace OverloadControl.Controllers
         [HttpPost]
         public bool AddCaseProgress(int caseId, int progressId, string content)
         {
-            var item = m_OCDbContext.Case_Progresses.Where(c => c.CaseId == caseId && c.ProgressId == progressId).FirstOrDefault();
-            if (item != null)
+            var existingProgressList = m_OCDbContext.Case_Progresses.Where(cp => cp.CaseId == caseId && cp.HistoryState == 0).ToList();
+
+            if (existingProgressList.Any())
             {
-                return false;
+                foreach (var item in existingProgressList)
+                {
+                    item.HistoryState = 1;//改为历史状态
+                }
             }
-            Case_Progress case_Progress = new Case_Progress();
-            case_Progress.CaseId = caseId;
-            case_Progress.ProgressId = progressId;
-            case_Progress.Time = DateTime.Now.ToString();
-            case_Progress._Content = content;
-            m_OCDbContext.Case_Progresses.Add(case_Progress);
+            // Add new progress
+            Case_Progress caseProgress = new Case_Progress();
+            caseProgress.CaseId = caseId;
+            caseProgress.ProgressId = progressId;
+            caseProgress.Time = DateTime.Now.ToString();
+            caseProgress._Content = content;
+            caseProgress.HistoryState = 0;
+            m_OCDbContext.Case_Progresses.Add(caseProgress);
             m_OCDbContext.SaveChanges();
             return true;
         }
@@ -173,36 +181,80 @@ namespace OverloadControl.Controllers
         }
 
         /// <summary>
-        /// 保存立案情况
+        /// 立案
         /// </summary>
         /// <param name="caseId"></param>
-        /// <param name="index3"></param>
+
         /// <param name="m_Content"></param>
         /// <returns></returns>
         [HttpPost]
-        public bool SaveOrderTake(int caseId, int index3, string m_Content)
+        public bool SaveOrderTake(int caseId, string m_Content)
         {
             var cases = m_OCDbContext.Cases.Where(c => c.Id == caseId).FirstOrDefault();
-            if (cases != null)
+            if (cases == null)
             {
-                if (index3 == 1)
-                {
-                    cases.OrderTake = "已立案";
-                    cases.State = "审理";
-                    AddCaseProgress(cases.Id, 3, null);
-                }
-                else
-                {
-                    cases.OrderTake = "不立案";
-                    AddCaseProgress(cases.Id, 8, null);
-                }
-
-                cases.M_Content = m_Content;
-
-                m_OCDbContext.SaveChanges();
-                return true;
+                return false;
             }
-            return false;
+
+            if (AddCaseProgress(cases.Id, 3, m_Content))
+            {
+                cases.State = "处理中";
+                cases.OrderTake = "处理中";
+                cases.Content = m_Content;
+                m_OCDbContext.SaveChanges();
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 不立案
+        /// </summary>
+        /// <param name="caseId"></param>
+
+        /// <param name="m_Content"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public bool SaveOrderTake11(int caseId, string m_Content)
+        {
+            var cases = m_OCDbContext.Cases.Where(c => c.Id == caseId).FirstOrDefault();
+            if (cases == null)
+            {
+                return false;
+            }
+
+            if (AddCaseProgress(cases.Id, 9, m_Content))
+            {
+                cases.State = "不立案";
+                cases.OrderTake = "不立案";
+                cases.Content = m_Content;
+                m_OCDbContext.SaveChanges();
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 回退案件
+        /// </summary>
+        /// <param name="caseId"></param>
+        /// <param name="m_Content"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public bool SaveOrderTake12(int caseId, string m_Content)
+        {
+            var cases = m_OCDbContext.Cases.Where(c => c.Id == caseId).FirstOrDefault();
+            if (cases == null)
+            {
+                return false;
+            }
+
+            if (AddCaseProgress(cases.Id, 3, m_Content))
+            {
+                cases.State = "处理中";
+                cases.OrderTake = "处理中";
+                cases.Content = m_Content;
+                m_OCDbContext.SaveChanges();
+            }
+            return true;
         }
     }
 }

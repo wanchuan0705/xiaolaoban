@@ -68,12 +68,7 @@ namespace OverloadControl.DataAccessor
                 entity.HasKey(c => c.Id);
                 entity.Property(c => c.Id).ValueGeneratedOnAdd();
             });
-            modelBuilder.Entity<Violators>(entity =>
-            {
-                entity.ToTable("ZC_Violators");
-                entity.HasKey(c => c.Id);
-                entity.Property(c => c.Id).ValueGeneratedOnAdd();
-            });
+
             modelBuilder.Entity<Case_Progress>(entity =>
             {
                 entity.ToTable("ZC_Case_Progress");
@@ -133,7 +128,6 @@ namespace OverloadControl.DataAccessor
         public DbSet<Police> Polices { get; set; }
         public DbSet<Progress> Progresses { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<Violators> Violators { get; set; }
 
         public DbSet<Case_Progress> Case_Progresses { get; set; }
 

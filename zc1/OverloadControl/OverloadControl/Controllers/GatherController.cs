@@ -25,7 +25,7 @@ namespace OverloadControl.Controllers
         /// <returns></returns>
 
         [HttpPost("SaveCase")]
-        public bool SaveCase([FromBody]Case cases)
+        public bool SaveCase([FromBody] Case cases)
         {
             if (cases != null)
             {
@@ -35,6 +35,23 @@ namespace OverloadControl.Controllers
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// 查看个人信息
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public Police GetPoliceById(int Id)
+        {
+            using (var context = new OCDbContext())
+            {
+                var query = from o in context.Polices
+                            where o.Id == Id
+                            select o;
+                return query.FirstOrDefault();
+            }
         }
 
         /// <summary>
@@ -159,25 +176,23 @@ namespace OverloadControl.Controllers
         [HttpPost]
         private bool AddCaseProgress(int caseId, int progressId, string content)
         {
-            var existingProgress = m_OCDbContext.Case_Progresses.FirstOrDefault(cp => cp.CaseId == caseId && cp.ProgressId == progressId);
+            var existingProgressList = m_OCDbContext.Case_Progresses.Where(cp => cp.CaseId == caseId && cp.HistoryState == 0).ToList();
 
-            if (existingProgress != null)
+            if (existingProgressList.Any())
             {
-                // Update existing progress
-                existingProgress.Time = DateTime.Now.ToString();
-                existingProgress._Content = content;
+                foreach (var item in existingProgressList)
+                {
+                    item.HistoryState = 1;//改为历史状态
+                }
             }
-            else
-            {
-                // Add new progress
-                Case_Progress caseProgress = new Case_Progress();
-                caseProgress.CaseId = caseId;
-                caseProgress.ProgressId = progressId;
-                caseProgress.Time = DateTime.Now.ToString();
-                caseProgress._Content = content;
-                m_OCDbContext.Case_Progresses.Add(caseProgress);
-            }
-
+            // Add new progress
+            Case_Progress caseProgress = new Case_Progress();
+            caseProgress.CaseId = caseId;
+            caseProgress.ProgressId = progressId;
+            caseProgress.Time = DateTime.Now.ToString();
+            caseProgress._Content = content;
+            caseProgress.HistoryState = 0;
+            m_OCDbContext.Case_Progresses.Add(caseProgress);
             m_OCDbContext.SaveChanges();
             return true;
         }
@@ -243,8 +258,8 @@ namespace OverloadControl.Controllers
             {
                 return false;
             }
-          ;
-            if (AddCaseProgress(item.Id, 9, content))
+   ;
+            if (AddCaseProgress(item.Id, 6, content))
             {
                 item.State = "已撤销";
                 item.Content = content;
@@ -261,35 +276,34 @@ namespace OverloadControl.Controllers
         /// <param name="progressId"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<Case>> GetCaseByCriteria(int policeId, int caseId, int progressId)
+        public async Task<ActionResult<List<Case>>> GetCaseByCriteria(int policeId, int? caseId, int? progressId)
         {
-            var policeCase = await m_OCDbContext.Police_Cases
-                .FirstOrDefaultAsync(pc => pc.PoliceId == policeId && pc.CaseId == caseId);
+            var policeCaseList = await m_OCDbContext.Police_Cases
+                .Where(pc => pc.PoliceId == policeId).ToListAsync();
 
-            if (policeCase == null)
+            if (!policeCaseList.Any())
             {
-                return NotFound("Police does not have access to this case.");
+                return NotFound("Police does not have access to any cases.");
             }
 
-            var caseProgress = await m_OCDbContext.Case_Progresses
-                .FirstOrDefaultAsync(cp => cp.CaseId == caseId && cp.ProgressId == progressId);
+            List<int> caseIdList = policeCaseList.Select(o => o.CaseId).ToList();
+            var a = caseIdList.FirstOrDefault();
+            var caseProgressList = m_OCDbContext.Case_Progresses.ToList().Where(cp => caseIdList.Contains(cp.CaseId) && cp.HistoryState == 0).ToList();
 
-            if (caseProgress == null)
+            if (progressId.HasValue)
             {
-                return NotFound("Case progress not found.");
+                caseProgressList = caseProgressList.Where(o => o.ProgressId == progressId).ToList();
             }
 
-            var requestedCase = await m_OCDbContext.Cases
-                .Include(c => c.Case_Progresses)
-                .ThenInclude(cp => cp.Progress)
-                .FirstOrDefaultAsync(c => c.Id == caseId);
+            List<int> filteredCaseIdList = caseProgressList.Select(o => o.CaseId).ToList();
+            var returnCaseList = m_OCDbContext.Cases.ToList().Where(c => caseId.HasValue ? c.Id == caseId : filteredCaseIdList.Contains(c.Id)).ToList();
 
-            if (requestedCase == null)
+            if (!returnCaseList.Any())
             {
-                return NotFound("Case not found.");
+                return NotFound("Cases not found.");
             }
 
-            return requestedCase;
+            return returnCaseList;
         }
     }
 }
