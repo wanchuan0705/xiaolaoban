@@ -198,36 +198,6 @@ namespace OverloadControl.Controllers
         }
 
         /// <summary>
-        /// 添加信息采集人员与案件的关系
-        /// </summary>
-        /// <param name="policeId"></param>
-        /// <param name="caseNo"></param>
-        /// <returns></returns>
-
-        [HttpPost]
-        public bool AddRelationShip(string policeId, string caseNo)
-        {
-            if (policeId != null && caseNo != null)
-            {
-                Police_Case item = new Police_Case();
-                item.PoliceId = int.Parse(policeId);
-                var cases = m_OCDbContext.Cases.Where(c => c.CaseNo == caseNo).FirstOrDefault();
-                if (cases != null)
-                {
-                    item.CaseId = cases.Id;
-                    if (!AddCaseProgress(item.CaseId, 1, cases.Details))
-                    {
-                        return false;
-                    }
-                    m_OCDbContext.Police_Cases.Add(item);
-                    m_OCDbContext.SaveChanges();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
         /// 根据案件状态查询案件
         /// </summary>
         /// <param name="PreId"></param>
@@ -241,6 +211,68 @@ namespace OverloadControl.Controllers
                         where o.ProgressId == PreId
                         select b;
             return JsonConvert.SerializeObject(cases);
+        }
+        /// <summary>
+        /// 案件提交
+        /// </summary>
+        /// <param name="policeId"></param>
+        /// <param name="policeName"></param>
+        /// <param name="caseNo"></param>
+        /// <param name="violatorsName"></param>
+        /// <param name="phone"></param>
+        /// <param name="address"></param>
+        /// <param name="details"></param>
+        /// <param name="platenumber"></param>
+        /// <param name="date"></param>
+        /// <param name="image"></param>
+        /// <param name="description"></param>
+        /// <param name="model"></param>
+        /// <param name="content"></param>
+        /// <param name="violatorsPhone"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public bool AddCase(int policeId, string policeName, int caseNo, string violatorsName, string phone, string address, string details, string platenumber, DateTime date, string image, string description, string model, string content, string violatorsPhone)
+        {
+            if (caseNo != 0)
+            {
+                Case casess = new Case();
+                {
+                    casess.CaseNo = caseNo;
+                    casess.ViolatorsName = violatorsName;
+                    casess.Address = address;
+                    casess.Details = details;
+                    casess.Platenumber = platenumber;
+                    casess.Date = date;
+                    casess.Phone = phone;
+                    casess.Image = image;
+                    casess.Description = description;
+                    casess.Model = model;
+                    casess.Content = content;
+                    casess.ViolatorsPhone = violatorsPhone;
+                    casess.ApplicationTime = DateTime.Now;
+                };
+
+                m_OCDbContext.Cases.Add(casess);
+                m_OCDbContext.SaveChanges();
+                Police_Case police_Case = new Police_Case();
+                {
+                    police_Case.PoliceId = policeId;
+                    police_Case.CaseId = casess.Id;
+                    casess.State = "未审核";
+                    casess.PolicerName = policeName;
+                }
+
+                Case_Progress case_Progresses = new Case_Progress();
+                {
+                    case_Progresses.CaseId = casess.Id;
+                    case_Progresses.ProgressId = 1;
+                    case_Progresses.HistoryState = 1;
+                }
+                m_OCDbContext.Police_Cases.Add(police_Case);
+                m_OCDbContext.Case_Progresses.Add(case_Progresses);
+                m_OCDbContext.SaveChanges();
+            }
+            return true;
         }
 
         /// <summary>

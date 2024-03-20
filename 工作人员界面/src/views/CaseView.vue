@@ -55,6 +55,9 @@
     </div>
     <el-dialog v-model="isAddShow" title="新增信息">
         <el-form :model="active">
+            <el-form-item label="CaseNo" label-width="50px">
+                <el-input v-model="active.CaseNo" autocomplete="off" />
+            </el-form-item>
             <el-form-item label="Address" label-width="50px">
                 <el-input v-model="active.Address" autocomplete="off" />
             </el-form-item>
@@ -68,7 +71,8 @@
                 <el-input v-model="active.Platenumber" autocomplete="off" />
             </el-form-item>
             <el-form-item label="Date" label-width="50px">
-                <el-input v-model="active.Date" autocomplete="off" />
+                <el-date-picker v-model="active.Date" type="datetime" placeholder="Select date and time"
+                    value-format="yyyy-MM-dd HH:mm:ss" :editable="false" />
             </el-form-item>
             <el-form-item label="Phone" label-width="50px">
                 <el-input v-model="active.Phone" autocomplete="off" />
@@ -102,8 +106,8 @@
             <el-form-item label="Judgment" label-width="50px">
                 <el-input v-model="active.Judgment" autocomplete="off" />
             </el-form-item>
-            <el-form-item label="M_Conten" label-width="50px">
-                <el-input v-model="active.M_Content" autocomplete="off" />
+            <el-form-item label="Content" label-width="50px">
+                <el-input v-model="active.Content" autocomplete="off" />
             </el-form-item>
             <el-form-item label="PolicerName1" label-width="50px">
                 <el-input v-model="active.PolicerName1" autocomplete="off" />
@@ -133,9 +137,15 @@
             <el-form-item label="Platenumber" label-width="50px">
                 <el-input v-model="active.Platenumber" autocomplete="off" />
             </el-form-item>
-            <el-form-item label="Date" label-width="50px">
-                <el-input v-model="active.Date" autocomplete="off" />
-            </el-form-item>
+              <el-form-item label="Date" label-width="50px">
+    <el-date-picker
+      v-model="active.Date"
+      type="datetime"
+      placeholder="Select date and time"
+      value-format="yyyy-MM-dd HH:mm:ss"
+      :editable="false"
+    />
+  </el-form-item>
             <el-form-item label="Phone" label-width="50px">
                 <el-input v-model="active.Phone" autocomplete="off" />
             </el-form-item>
@@ -202,6 +212,7 @@ import axios from "axios";
 import { ElNotification } from "element-plus";
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from "vue";
 import { InitData, ListInt } from "../type/case";
+import { loginStore } from "@/stores/login";
 export default defineComponent({
     setup() {
         const data = reactive(new InitData());
@@ -358,9 +369,42 @@ export default defineComponent({
                     offset: 100,
                 })
         }
-        const addUser = () => {
+        const addUser = async () => {
             data.list.push(data.active)
             
+            const login = loginStore();
+            const { policeId } = login
+            const res = await axios.get(`http://localhost:5172/api/Admin/GetCase?PoliceId=${policeId}`);
+            // 处理响应
+            const requestData = {
+                policeId: policeId,
+                policeName: res.data.policeId,
+                caseNo: data.active.CaseNo,
+                violatorsName: data.active.ViolatorsName,
+                phone: data.active.Phone,
+                address: data.active.Address,
+                details: data.active.Details,
+                platenumber: data.active.Platenumber,
+                date: data.active.Date,
+                image: data.active.Image,
+                description: data.active.Description,
+                model: data.active.Model,
+                content: data.active.Content,
+                violatorsPhone: data.active.ViolatorsPhone
+            };
+            debugger;
+            const queryParams = Object.entries(requestData)
+                .map(([key, value]) => `${key}=${encodeURIComponent(value.toString())}`)
+                .join('&');
+
+           
+
+            try {
+                const response = await axios.post(`http://localhost:5172/api/Gather/AddCase?${queryParams}`);
+                console.log(response);
+            } catch (error) {
+                console.error(error);
+            }
             data.isAddShow = false,
                 ElNotification.success({
                     title: '已完成',

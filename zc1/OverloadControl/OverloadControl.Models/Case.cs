@@ -11,7 +11,7 @@ namespace OverloadControl.Models
     /// </summary>
     public class Case
     {
-        public string CaseNo { get; set; }
+        public int CaseNo { get; set; }
 
         public int Id
         { get; set; }
@@ -28,7 +28,7 @@ namespace OverloadControl.Models
         public string Platenumber
         { get; set; }
 
-        public DateTime Date
+        public DateTime? Date
         { get; set; }
 
         public string Phone
@@ -46,7 +46,7 @@ namespace OverloadControl.Models
         public string ViolatorsName
         { get; set; }
 
-        public string ApplicationTime
+        public DateTime ApplicationTime
         { get; set; }
 
         public string Description
