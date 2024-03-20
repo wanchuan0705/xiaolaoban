@@ -458,6 +458,32 @@ namespace OverloadControl.Controllers
         }
 
         /// <summary>
+        /// 结案不通过
+        /// </summary>
+        /// <param name="caseId"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+
+        [HttpPut]
+        public bool handleCase1(string caseId, string content)
+        {
+            var item = m_AdminContext.Cases.Where(c => c.Id == int.Parse(caseId)).FirstOrDefault();
+            if (item == null)
+            {
+                return false;
+            }
+         ;
+            if (AddCaseProgress(item.Id, 3, content))
+            {
+                item.State = "处理中";
+                item.OrderTake = "处理中";
+                item.Content = content;
+                m_AdminContext.SaveChanges();
+            }
+            return true;
+        }
+
+        /// <summary>
         /// 统计案件处理情况
         /// </summary>
         /// <param name="backendName"></param>

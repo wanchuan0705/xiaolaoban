@@ -22,9 +22,9 @@ import { ElMessage, ElMessageBox, FormInstance } from 'element-plus';
 import type { Action } from 'element-plus'
 import { defineComponent, reactive, ref, toRefs } from 'vue'
 import { LoginData } from "../type/login"
-// import { login } from "../request/api";
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { loginStore } from '@/stores/login';
 export default defineComponent({
     setup() {
         const data = reactive(new LoginData());
@@ -77,6 +77,10 @@ export default defineComponent({
                         console.log(response.data); // 假设响应返回数据
 
                         if (response.status === 200) {
+                            const login = loginStore();
+                            login.policeId = response.data.userId;
+                            login.roleId = response.data.roleId;
+                            login.password = response.data.password 
                             router.push('/')
                         }
                         else {
@@ -92,10 +96,7 @@ export default defineComponent({
                                 },
                             })
                         }
-                    } else {
-                        console.log("error submit!");
-                        return false;
-                    }
+                    } 
                 });
                 console.log(formEl);
             }

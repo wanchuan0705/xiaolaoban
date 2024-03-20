@@ -126,8 +126,8 @@ namespace OverloadControl.Controllers
         /// <param name="phone"></param>
         /// <returns></returns>
 
-        [HttpPut("UpdatePolice/{id}")]
-        public IActionResult UpdatePolice(int id, [FromBody] string name, string password, string phone)
+        [HttpPut]
+        public IActionResult UpdatePolice(int id, string name, string password, string phone)
         {
             var police = m_OCDbContext.Polices.FirstOrDefault(l => l.Id == id);
             if (police == null)
