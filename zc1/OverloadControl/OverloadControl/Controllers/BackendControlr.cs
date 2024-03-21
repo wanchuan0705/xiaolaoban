@@ -200,7 +200,7 @@ namespace OverloadControl.Controllers
             {
                 cases.State = "处理中";
                 cases.OrderTake = "处理中";
-                cases.Content = m_Content;
+                cases.s_Content = m_Content;
                 m_OCDbContext.SaveChanges();
             }
             return true;

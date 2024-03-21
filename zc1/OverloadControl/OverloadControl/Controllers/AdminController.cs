@@ -451,7 +451,7 @@ namespace OverloadControl.Controllers
             {
                 item.State = "已结案";
                 item.OrderTake = "已结案";
-                item.Content = content;
+                item.d_Content = content;
                 m_AdminContext.SaveChanges();
             }
             return true;
@@ -560,7 +560,7 @@ namespace OverloadControl.Controllers
             {
                 item.State = "已驳回";
                 item.OrderTake = "已驳回";
-                item.Content = content;
+                item.M_Content = content;
 
                 m_AdminContext.SaveChanges();
             }

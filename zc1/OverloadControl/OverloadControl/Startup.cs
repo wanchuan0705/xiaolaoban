@@ -40,7 +40,7 @@ namespace OverloadControl
                             .AllowAnyHeader();
                 });
             });
-            //InitDB();
+            InitDB();
             services.AddControllers();
             services.AddControllersWithViews().AddJsonOptions(cfg =>
             {

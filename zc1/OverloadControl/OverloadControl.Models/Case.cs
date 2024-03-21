@@ -55,19 +55,25 @@ namespace OverloadControl.Models
         public string Model
         { get; set; }
 
-        public string Judgment
+        public string? Judgment
         { get; set; }
 
-        public string M_Content
+        public string? M_Content
         { get; set; }
 
-        public string Content
+        public string? Content
         { get; set; }
 
-        public string PolicerName1
+        public string? d_Content
         { get; set; }
 
-        public string ViolatorsPhone
+        public string? s_Content
+        { get; set; }
+
+        public string? PolicerName1
+        { get; set; }
+
+        public string? ViolatorsPhone
         { get; set; }
 
         public string OrderTake { get; set; }

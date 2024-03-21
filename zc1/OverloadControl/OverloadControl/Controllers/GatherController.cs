@@ -19,25 +19,6 @@ namespace OverloadControl.Controllers
         }
 
         /// <summary>
-        /// 保存案件申请单
-        /// </summary>
-        /// <param name="cases"></param>
-        /// <returns></returns>
-
-        [HttpPost("SaveCase")]
-        public bool SaveCase([FromBody] Case cases)
-        {
-            if (cases != null)
-            {
-                cases.State = "未审核";
-                m_OCDbContext.Cases.Add(cases);
-                m_OCDbContext.SaveChanges();
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
         /// 查看个人信息
         /// </summary>
         /// <param name="Id"></param>
@@ -71,51 +52,6 @@ namespace OverloadControl.Controllers
         /// </summary>
         /// <param name="cases"></param>
         /// <returns></returns>
-        [HttpPost]
-        public string UploadFile([FromBody] Case cases)
-        {
-            if (this.ModelState.IsValid)
-            {
-                var fileRequest = Request.Form.Files[0];
-                if (fileRequest.Length > 0)
-                {
-                    using (var stream = fileRequest.OpenReadStream())
-                    {
-                        int len = 0;
-                        var buffer = new byte[1024];
-
-                        var fs = new System.IO.FileInfo(fileRequest.FileName);
-
-                        var now = DateTime.Now;
-                        var dir = @"D:\file";
-
-                        var filePath = System.IO.Path.Combine(dir, $"{now.Ticks}{fs.Extension}");
-                        cases.Image = $"{now.Ticks}{fs.Extension}";
-                        if (SaveCase(cases))
-                        {
-                            if (!System.IO.Directory.Exists(dir))
-                            {
-                                System.IO.Directory.CreateDirectory(dir);
-                            }
-
-                            using (var fileStream = new System.IO.FileStream(filePath, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write))
-                            {
-                                while ((len = stream.Read(buffer, 0, buffer.Length)) > 0)
-                                {
-                                    fileStream.Write(buffer, 0, len);
-                                }
-                            }
-                            return "ok";
-                        }
-                        else
-                        {
-                            return "";
-                        }
-                    }
-                }
-            }
-            return "";
-        }
 
         /// <summary>
         /// 修改个人信息
@@ -212,6 +148,7 @@ namespace OverloadControl.Controllers
                         select b;
             return JsonConvert.SerializeObject(cases);
         }
+
         /// <summary>
         /// 案件提交
         /// </summary>
@@ -291,7 +228,7 @@ namespace OverloadControl.Controllers
                 return false;
             }
    ;
-            if (AddCaseProgress(item.Id, 6, content))
+            if (AddCaseProgress(item.Id, 9, content))
             {
                 item.State = "已撤销";
                 item.Content = content;
