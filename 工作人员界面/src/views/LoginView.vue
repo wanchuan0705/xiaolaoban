@@ -81,7 +81,6 @@ export default defineComponent({
                             login.policeId = response.data.userId;
                             login.roleId = response.data.roleId;
                             login.password = response.data.password;
-                            login.policeName = response.data.policeName
                             router.push('/')
                         }
                         else {

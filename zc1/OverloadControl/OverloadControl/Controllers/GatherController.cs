@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using OverloadControl.Models;
 using OverloadControl.DataAccessor;
 using Microsoft.EntityFrameworkCore;
+using OverloadControl.Models.Dto;
 
 namespace OverloadControl.Controllers
 {
@@ -168,24 +169,24 @@ namespace OverloadControl.Controllers
         /// <param name="violatorsPhone"></param>
         /// <returns></returns>
         [HttpPost]
-        public bool AddCase(int policeId, string policeName, int caseNo, string violatorsName, string phone, string address, string details, string platenumber, DateTime date, string image, string description, string model, string content, string violatorsPhone)
+        public bool AddCase([FromBody] CaseData caseData)
         {
-            if (caseNo != 0)
+            if (caseData.CaseNo != 0)
             {
                 Case casess = new Case();
                 {
-                    casess.CaseNo = caseNo;
-                    casess.ViolatorsName = violatorsName;
-                    casess.Address = address;
-                    casess.Details = details;
-                    casess.Platenumber = platenumber;
-                    casess.Date = date;
-                    casess.Phone = phone;
-                    casess.Image = image;
-                    casess.Description = description;
-                    casess.Model = model;
-                    casess.Content = content;
-                    casess.ViolatorsPhone = violatorsPhone;
+                    casess.CaseNo = caseData.CaseNo;
+                    casess.ViolatorsName = caseData.ViolatorsName;
+                    casess.Address = caseData.Address;
+                    casess.Details = caseData.Details;
+                    casess.Platenumber = caseData.PlateNumber;
+                    casess.Date = caseData.Date;
+                    casess.Phone = caseData.Phone;
+                    casess.Image = caseData.Image;
+                    casess.Description = caseData.Description;
+                    casess.Model = caseData.Model;
+                    casess.Content = caseData.Content;
+                    casess.ViolatorsPhone = caseData.ViolatorsPhone;
                     casess.ApplicationTime = DateTime.Now;
                 };
 
@@ -193,10 +194,10 @@ namespace OverloadControl.Controllers
                 m_OCDbContext.SaveChanges();
                 Police_Case police_Case = new Police_Case();
                 {
-                    police_Case.PoliceId = policeId;
+                    police_Case.PoliceId = caseData.PoliceId;
                     police_Case.CaseId = casess.Id;
                     casess.State = "未审核";
-                    casess.PolicerName = policeName;
+                    casess.PolicerName = caseData.PoliceName;
                 }
 
                 Case_Progress case_Progresses = new Case_Progress();

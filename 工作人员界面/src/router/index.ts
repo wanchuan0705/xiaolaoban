@@ -6,13 +6,13 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "home",
     component: HomeView,
-    redirect: "caseStatistics", //设置重定向
+    redirect: "Case", //设置重定向
     children: [
       {
         path: "caseStatistics",
         name: "caseStatistics",
         meta: {
-          isShow: true,
+          isShow: false,
           title: "案件统计",
         },
         component: () =>
@@ -22,7 +22,7 @@ const routes: Array<RouteRecordRaw> = [
         path: "user",
         name: "user",
         meta: {
-          isShow: true,
+          isShow: false,
           title: "执法人员管理",
         },
         component: () => import("../views/PoliceView.vue"),
@@ -31,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
         path: "lawType",
         name: "lawType",
         meta: {
-          isShow: true,
+          isShow: false,
           title: "法律条文类型管理",
         },
         component: () => import("../views/LawType.vue"),
@@ -40,7 +40,7 @@ const routes: Array<RouteRecordRaw> = [
         path: "Law",
         name: "Law",
         meta: {
-          isShow: true,
+          isShow: false,
           title: "法律条文管理",
         },
         component: () => import("../views/LawView.vue"),

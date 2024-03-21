@@ -64,6 +64,7 @@ export class InitData {
   list: ListInt[] = []; //用来接受用户信息的列表
   isShow = false;
   isAddShow = false;
+  isCancelShow = false;
   active: ActiveInt = {
    CaseNo:"",
     Id: 0,
