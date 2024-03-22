@@ -198,8 +198,8 @@ namespace OverloadControl.Controllers
 
             if (AddCaseProgress(cases.Id, 3, m_Content))
             {
-                cases.State = "处理中";
-                cases.OrderTake = "处理中";
+                cases.State = "已立案";
+                cases.OrderTake = "已立案";
                 cases.s_Content = m_Content;
                 m_OCDbContext.SaveChanges();
             }
