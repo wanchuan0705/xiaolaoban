@@ -22,6 +22,7 @@ export class InitData {
   list: ListInt[] = []; //用来接受用户信息的列表
   isShow = false;
   isAddShow = false;
+  isCheckShow = false;
   active: ActiveInt = {
     //选中的对象
     Id: 0,

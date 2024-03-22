@@ -12,7 +12,9 @@ import {
     LegendComponent
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide } from "vue";
+import { ref, provide, onMounted, reactive } from "vue";
+import axios from "axios";
+import { InitData } from "@/type/case";
 
 use([
     CanvasRenderer,
@@ -26,7 +28,7 @@ provide(THEME_KEY, "dark");
 
 const option = ref({
     title: {
-        text: "Traffic Sources",
+        text: "案件进度",
         left: "center"
     },
     tooltip: {
@@ -36,20 +38,23 @@ const option = ref({
     legend: {
         orient: "vertical",
         left: "left",
-        data: ["Direct", "Email", "Ad Networks", "Video Ads", "Search Engines"]
+        data: ["未审核", "已审核", "已立案", "已完成", "已结案", "已驳回", "不立案", "已撤销s"]
     },
     series: [
         {
-            name: "Traffic Sources",
+            name: "案件进度",
             type: "pie",
             radius: "55%",
             center: ["50%", "60%"],
             data: [
-                { value: 335, name: "Direct" },
-                { value: 310, name: "Email" },
-                { value: 234, name: "Ad Networks" },
-                { value: 135, name: "Video Ads" },
-                { value: 1548, name: "Search Engines" }
+                { value: 335, name: "未审核" },
+                { value: 310, name: "已审核" },
+                { value: 234, name: "已立案" },
+                { value: 135, name: "已完成" },
+                { value: 1548, name: "已结案" },
+                { value: 1548, name: "已驳回" },
+                { value: 1548, name: "不立案" },
+                { value: 1548, name: "已撤销" }
             ],
             emphasis: {
                 itemStyle: {
@@ -61,6 +66,27 @@ const option = ref({
         }
     ]
 });
+onMounted(() => {
+    getCase();
+});
+const getCase = async () => {
+    try {
+        const data = reactive(new InitData());
+        debugger
+        const res = await axios.get(`http://localhost:5172/api/Admin/GetCases`);
+
+        // 处理响应
+        console.log(res.data); // 假设响应返回数据
+        if (res && res.data) {
+            // 确保 res 和 res.data 都存在
+            data.list = res.data;
+            data.selectData.count = res.data.length;
+            console.log(data.list);
+        }
+    } catch (error) {
+        console.error("Error fetching goods:", error);
+    }
+};
 </script>
 
 <style scoped>

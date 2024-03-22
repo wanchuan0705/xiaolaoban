@@ -18,12 +18,10 @@
             <el-table-column prop="Name" label="名称" />
             <el-table-column label="操作">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click="changeUser(scope.row)" icon="edit">
-                        编辑
+                    <el-button link type="primary" icon="edit" size="small" @click="Check(scope.row)"
+                        v-if="scope.row.State === '已审核'">
+                        审核
                     </el-button>
-                    <!-- <el-button link type="primary" size="small" @click="changeUser(scope.row)">
-                        删除
-                    </el-button> -->
                 </template>
             </el-table-column>
         </el-table>
@@ -56,12 +54,28 @@
             </span>
         </template>
     </el-dialog>
+    <el-dialog v-model="isCheckShow" title="审核案件">
+        <el-form :model="active">
+            <el-form-item label="指派人员Id" label-width="100px">
+                <el-input v-model="active.Id" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="原因" label-width="100px">
+                <el-input v-model="active.Name" autocomplete="off" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="AddPoliceCase"><el-icon><Select /></el-icon>确认</el-button>
+                <el-button type="primary" @click="isCheckShow = false">取消</el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
 
 <script lang="ts" >
 import axios from "axios";
 import { ElNotification } from "element-plus";
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from "vue";
 import { InitData, ListInt } from "../type/lawType";
 export default defineComponent({
     setup() {
@@ -69,6 +83,14 @@ export default defineComponent({
         onMounted(() => {
             getUser();
         });
+        const caseId = ref(0);
+        const Check = (row: ListInt) => {
+            caseId.value = row.Id;
+            data.isCheckShow = true;
+        };
+        const AddPoliceCase = async () => {
+            await axios.put(`http://localhost:5172/api/Admin/AddPoliceCase?caseId=${caseId.value}&content=${data.active.Name}&policeId=${data.active.Id}`);
+        };
         const getUser = async () => {
             try {
                 const res = await axios.get('http://localhost:5172/api/Admin/GetLawType');
@@ -177,7 +199,7 @@ export default defineComponent({
                     offset: 100,
                 })
         }
-        return { ...toRefs(data), dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
+        return { ...toRefs(data), Check, AddPoliceCase, dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
     },
 });
 </script>

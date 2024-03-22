@@ -23,9 +23,9 @@
                     <el-button link type="primary" icon="Edit" size="small" @click="changeUser(scope.row)">
                         编辑
                     </el-button>
-                    <el-button link type="primary" icon="delete" size="small" @click="changeUser(scope.row)">
+                    <!-- <el-button link type="primary" icon="delete" size="small" @click="changeUser(scope.row)">
                         删除
-                    </el-button>
+                    </el-button> -->
                 </template>
             </el-table-column>
         </el-table>
