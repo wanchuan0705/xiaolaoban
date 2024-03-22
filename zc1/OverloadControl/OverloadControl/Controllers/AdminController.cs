@@ -184,19 +184,19 @@ namespace OverloadControl.Controllers
         /// <param name="age"></param>
         /// <returns></returns>
 
-        [HttpPut("UpdatePolice/{id}")]
-        public IActionResult UpdatePolice(int id, [FromBody] string name, string sex, string password, string phone, int age)
+        [HttpPut]
+        public IActionResult UpdatePolice(int Id, string Name, string Sex, string Password, string Phone, int Age)
         {
-            var police = m_AdminContext.Polices.FirstOrDefault(l => l.Id == id);
+            var police = m_AdminContext.Polices.FirstOrDefault(l => l.Id == Id);
             if (police == null)
             {
                 return NotFound();
             }
-            police.Age = age;
-            police.Sex = sex;
-            police.Name = name;
-            police.Password = password;
-            police.Phone = phone;
+            police.Age = Age;
+            police.Sex = Sex;
+            police.Name = Name;
+            police.Password = Password;
+            police.Phone = Phone;
             m_AdminContext.Entry(police).State = EntityState.Modified;
             m_AdminContext.SaveChanges();
             return NoContent();
