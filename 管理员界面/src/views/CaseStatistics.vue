@@ -47,14 +47,14 @@ const option = ref({
             radius: "55%",
             center: ["50%", "60%"],
             data: [
-                { value: 335, name: "未审核" },
-                { value: 310, name: "已审核" },
-                { value: 234, name: "已立案" },
-                { value: 135, name: "已完成" },
-                { value: 1548, name: "已结案" },
-                { value: 1548, name: "已驳回" },
-                { value: 1548, name: "不立案" },
-                { value: 1548, name: "已撤销" }
+                { value: 5, name: "未审核" },
+                { value: 5, name: "已审核" },
+                { value: 5, name: "已立案" },
+                { value: 5, name: "已完成" },
+                { value: 5, name: "已结案" },
+                { value: 5, name: "已驳回" },
+                { value: 5, name: "不立案" },
+                { value: 5, name: "已撤销" }
             ],
             emphasis: {
                 itemStyle: {
@@ -72,7 +72,6 @@ onMounted(() => {
 const getCase = async () => {
     try {
         const data = reactive(new InitData());
-        debugger
         const res = await axios.get(`http://localhost:5172/api/Admin/GetCases`);
 
         // 处理响应
@@ -82,11 +81,24 @@ const getCase = async () => {
             data.list = res.data;
             data.selectData.count = res.data.length;
             console.log(data.list);
+            // 确保 res 和 res.data 都存在
+            updateSeriesData(res.data);
         }
     } catch (error) {
         console.error("Error fetching goods:", error);
     }
 };
+const updateSeriesData = (data: Array<{ state: string }>) => {
+    const seriesData = option.value.series[0].data;
+    data.forEach(entry => {
+        const index = option.value.legend.data.indexOf(entry.state);
+        if (index !== -1) {
+            seriesData[index].value += 1;
+        }
+    });
+    console.log(option.value.series[0].data);
+};
+
 </script>
 
 <style scoped>
