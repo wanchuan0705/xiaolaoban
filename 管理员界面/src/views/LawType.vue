@@ -152,7 +152,8 @@ export default defineComponent({
                 }
             })
             // 发送 PUT 请求
-            await axios.put('http://localhost:5172/api/Admin/PutLawType', obj);
+            await axios.put(`http://localhost:5172/api/Admin/UpdateLawType?id=${data.active.Id}&updatedLawType=${data.active.Name}`);
+      
             data.isShow = false,
                 ElNotification.success({
                     title: '已完成',

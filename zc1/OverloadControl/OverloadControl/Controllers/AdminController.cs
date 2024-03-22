@@ -713,8 +713,8 @@ namespace OverloadControl.Controllers
         /// <param name="id"></param>
         /// <param name="updatedLawType"></param>
         /// <returns></returns>
-        [HttpPut("update/{id}")]
-        public IActionResult UpdateLawType(int id, [FromBody] string updatedLawType)
+        [HttpPut]
+        public IActionResult UpdateLawType(int id, string updatedLawType)
         {
             // 查找要修改的 LawType 对象
             var lawType = m_AdminContext.lawTypes.FirstOrDefault(lt => lt.Id == id);
