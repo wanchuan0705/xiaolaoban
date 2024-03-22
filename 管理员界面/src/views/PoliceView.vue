@@ -191,20 +191,22 @@ export default defineComponent({
     const updateUser = async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let obj: any = data.list.find((value) => value.Id == data.active.Id)
-      obj.Account = data.active.Account
+      obj.Name = data.active.Name
+      obj.Sex = data.active.Sex
       obj.Password = data.active.Password
       obj.Phone = data.active.Phone
-      obj.Name = data.active.Name
       obj.Age = data.active.Age
-      obj.Sex = data.active.Sex
+     
       console.log(obj);
       data.list.forEach((item, i) => {
         if (item.Id == obj.id) {
           data.list[i] = obj
         }
       })
+      debugger
       // 发送 PUT 请求
-      await axios.put('http://localhost:5172/api/Admin/PutPolice', obj);
+      await axios.put(`http://localhost:5172/api/Admin/UpdatePolice?Id=${data.active.Id}&Name=${data.active.Name}&Sex=${data.active.Sex}&Password=${data.active.Password}&Phone=${data.active.Phone}&Age=${data.active.Age}`);
+
       data.isShow = false,
         ElNotification.success({
           title: '已完成',
