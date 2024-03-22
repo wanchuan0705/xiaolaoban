@@ -33,13 +33,13 @@
                         v-if="scope.row.State === '已审核'">
                         审核
                     </el-button>
-                    <el-button link type="primary" icon="edit" size="small" @click="Cancel(scope.row)"
+                    <el-button link type="primary" icon="edit" size="small" @click="rollBack(scope.row)"
                         v-if="scope.row.State === '已完成'">
                         回退
                     </el-button>
-                    <el-button link type="primary" icon="edit" size="small" @click="Cancel(scope.row)"
-                        v-if="scope.row.State === '已立案'">
-                       审理
+                    <el-button link type="primary" icon="edit" size="small" @click="Check2(scope.row)"
+                        v-if="scope.row.State === '已立案' || scope.row.State === '处理中'">
+                        审理
                     </el-button>
                 </template>
             </el-table-column>
@@ -47,6 +47,7 @@
             <el-table-column prop="CaseNo" label="CaseNo" />
             <el-table-column prop="State" label="状态" />
             <el-table-column prop="Address" label="Address" />
+            <el-table-column prop="LawTypeId" label="LawTypeId" />
             <el-table-column prop="Types" label="Types" />
             <el-table-column prop="Details" label="Details" />
             <el-table-column prop="Platenumber" label="Platenumber" />
@@ -123,7 +124,6 @@
         <el-form :model="active">
             <el-form-item label="是否接收" label-width="100px">
                 <el-switch v-model="isCheck" />
-
             </el-form-item>
             <el-form-item label="原因" label-width="100px">
                 <el-input v-model="active.Content" autocomplete="off" />
@@ -133,6 +133,40 @@
             <span class="dialog-footer">
                 <el-button @click="SaveOrderTake"><el-icon><Select /></el-icon>确认</el-button>
                 <el-button type="primary" @click="isCancelShow = false">取消</el-button>
+            </span>
+        </template>
+    </el-dialog>
+    <el-dialog v-model="isCheck2" title="审理案件">
+        <el-form :model="active2">
+            <el-form-item label="法律" label-width="100px">
+                <el-select v-model="active2.Id" placeholder="请选择法律">
+                    <el-option v-for="law in lawData" :key="law.Id" :label="law.Content" :value="law.Id"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="content" label-width="100px">
+                <el-input v-model="content0" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="content1" label-width="100px">
+                <el-input v-model="content1" autocomplete="off" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="AddCaseLaw"><el-icon><Select /></el-icon>确认</el-button>
+                <el-button type="primary" @click="isCheck2 = false">取消</el-button>
+            </span>
+        </template>
+    </el-dialog>
+    <el-dialog v-model="isRollBackShow" title="审核案件">
+        <el-form :model="active">
+            <el-form-item label="原因" label-width="100px">
+                <el-input v-model="active.Content" autocomplete="off" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="SaveOrderTake12"><el-icon><Select /></el-icon>确认</el-button>
+                <el-button type="primary" @click="isRollBackShow = false">取消</el-button>
             </span>
         </template>
     </el-dialog>
@@ -151,6 +185,36 @@ export default defineComponent({
         onMounted(() => {
             getCase();
         });
+        const rollBack = (row: ListInt) => {
+            caseId.value = row.Id;
+            data.isRollBackShow = true;
+            
+        };
+        const content0 = ref("")
+        const content1 = ref("")
+        const AddCaseLaw = async () => {
+            try {
+                const response = await axios.post('http://localhost:5172/api/BackendControlr/AddCaseLaw', null, {
+                    params: {
+                        caseId: caseId.value,
+                        lawId: data.active2.Id
+                    }
+                });
+                debugger
+                await axios.put(`http://localhost:5172/api/BackendControlr/handleCase?caseId=${caseId.value}&lawId=${data.active2.Id}&content=${content0.value}&content1=${content0.value}`);
+                console.log(response);
+            } catch (error) {
+                console.error(error);
+            }
+            data.isAddShow = false,
+                ElNotification.success({
+                    title: '已完成',
+                    message: '添加成功',
+                    offset: 100,
+                })
+            data.isCheck2 = false;
+            getCase();
+        };
         const getCase = async () => {
             try {
                 const login = loginStore();
@@ -182,6 +246,35 @@ export default defineComponent({
             caseId.value = row.Id;
             data.isCancelShow = true;
         };
+        const Check2 = async (row: ListInt) => {
+            caseId.value = row.Id;
+            data.isCheck2 = true;
+            const response = await axios.get(`http://localhost:5172/api/BackendControlr/GetLaw?lawtypeId=${row.LawTypeId}`);
+            data.lawData = response.data;
+            console.log(response)
+        };
+        const SaveOrderTake12 = async () => {
+            try {
+                debugger
+                const response = await axios.post('http://localhost:5172/api/BackendControlr/SaveOrderTake12', null, {
+                    params: {
+                        caseId: caseId.value,
+                        m_Content: data.active.Content
+                    }
+                });
+                console.log(response);
+            } catch (error) {
+                console.error(error);
+            }
+            data.isAddShow = false,
+                ElNotification.success({
+                    title: '已完成',
+                    message: '添加成功',
+                    offset: 100,
+                })
+            data.isRollBackShow = false;
+            getCase();
+        }
         const SaveOrderTake = async () => {
             // const requestData = {
             //     caseId: data.active.Id,
@@ -253,7 +346,8 @@ export default defineComponent({
                 PolicerName1: "",
                 ViolatorsPhone: "",
                 OrderTake: "",
-                LegalArticles: ""
+                LegalArticles: "",
+                LawTypeId: 0
             };
         };
         const onSubmit = () => {
@@ -322,8 +416,8 @@ export default defineComponent({
                 PolicerName1: row.PolicerName1,
                 ViolatorsPhone: row.ViolatorsPhone,
                 OrderTake: row.OrderTake, // 补充 OrderTake
-                LegalArticles: row.LegalArticles // 补充 LegalArticles
-
+                LegalArticles: row.LegalArticles, // 补充 LegalArticles
+                LawTypeId: row.LawTypeId
             }
             data.isShow = true
 
@@ -407,7 +501,7 @@ export default defineComponent({
                     offset: 100,
                 })
         }
-        return { ...toRefs(data), isCheck,SaveOrderTake, Check, Cancel,CancelCase,dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
+        return { ...toRefs(data), rollBack, content0, content1, AddCaseLaw, Check2, isCheck, SaveOrderTake, SaveOrderTake12, Check, Cancel,CancelCase,dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
     },
 });
 </script>

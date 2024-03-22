@@ -133,8 +133,7 @@ namespace OverloadControl.Controllers
         /// <param name="progressId"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        [HttpPost]
-        public bool AddCaseProgress(int caseId, int progressId, string content)
+        private bool AddCaseProgress(int caseId, int progressId, string content)
         {
             var existingProgressList = m_OCDbContext.Case_Progresses.Where(cp => cp.CaseId == caseId && cp.HistoryState == 0).ToList();
 

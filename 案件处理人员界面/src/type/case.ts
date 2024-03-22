@@ -23,7 +23,7 @@ PolicerName1: string;
 ViolatorsPhone: string;
 OrderTake: string;
 LegalArticles: string;
-
+LawTypeId:number
 }
 interface SelectDataInt {
   status: string;
@@ -54,9 +54,22 @@ PolicerName1: string;
 ViolatorsPhone: string;
 OrderTake: string;
 LegalArticles: string;
-
+LawTypeId:number
+}
+interface ActiveInt2{
+  Id: number,
+  Content:string
+}
+interface LawInt{
+  Id: number,
+  Content:string
 }
 export class InitData {
+  lawData: LawInt[] = []
+  active2: ActiveInt2 = {
+    Id: 0,
+    Content: ""
+  }
   selectData: SelectDataInt = {
     status: "",
     page: 1,
@@ -67,6 +80,8 @@ export class InitData {
   isShow = false;
   isAddShow = false;
   isCancelShow = false;
+  isCheck2 = false;
+  isRollBackShow = false;
   active: ActiveInt = {
    CaseNo:"",
     Id: 0,
@@ -89,6 +104,7 @@ export class InitData {
   PolicerName1: "",
   ViolatorsPhone: "",
   OrderTake: "",
-  LegalArticles: ""
+  LegalArticles: "",
+  LawTypeId:0
   };
 }
