@@ -23,9 +23,6 @@
                     <el-button link type="primary" icon="Edit" size="small" @click="changeUser(scope.row)">
                         编辑
                     </el-button>
-                    <!-- <el-button link type="primary" icon="delete" size="small" @click="changeUser(scope.row)">
-                        删除
-                    </el-button> -->
                 </template>
             </el-table-column>
         </el-table>
@@ -34,7 +31,19 @@
     </div>
     <el-dialog v-model="isAddShow" title="新增信息">
         <el-form :model="active">
-            <el-form-item label="内容" label-width="50px">
+            <el-form-item label="法律类型" label-width="100px">
+                <el-dropdown size="large" split-button type="primary">
+                    <span>{{ selectedLawType.Name }}</span> <!-- 显示当前选中的法律类型的名称 -->
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item v-for="type in Types" :key="type.Id" @click="selectLawType(type)">
+                                {{ type.Name }}
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+            </el-form-item>
+            <el-form-item label="内容" label-width="100px">
                 <el-input v-model="active.Content" autocomplete="off" />
             </el-form-item>
         </el-form>
@@ -67,11 +76,13 @@
 <script lang="ts">
 import axios from "axios";
 import { ElNotification } from "element-plus";
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from "vue";
 import { InitData, ListInt } from "../type/law";
 export default defineComponent({
     setup() {
         const data = reactive(new InitData());
+        const Types = ref([{ Id: 0, Name: '' }]); // 存储从接口获取的法律类型数据
+        const selectedLawType = ref({ Id: 0, Name: "" }); // 存储当前选中的法律类型
         onMounted(() => {
             getUser();
         });
@@ -104,12 +115,18 @@ export default defineComponent({
                 );
             }),
         });
-        const addClick = () => {
+        const addClick = async () => {
             data.isAddShow = true; // 更新 isAddShow 的值
+            const resTypes = await axios.get('http://localhost:5172/api/Admin/GetLawType');
+            Types.value = resTypes.data; // 将获取到的数据存储到 resTypes 中
             data.active = {
                 Id: 0,
                 Content: "",
             };
+        };
+        const selectLawType = (type: { Id: number; Name: string; }) => {
+            selectedLawType.value = type; // 更新当前选中的法律类型
+            data.active.Id = type.Id; // 更新 active 对象中的 Id
         };
         const onSubmit = () => {
             let arr: ListInt[] = []; //定义数组，用来接受查询过后要展示的数据
@@ -165,16 +182,23 @@ export default defineComponent({
                     offset: 100,
                 })
         }
-        const addUser = () => {
+        const addUser = async () => {
             data.list.push(data.active)
+            await axios.post('http://localhost:5172/api/Admin/AddLaw1', null, {
+                params: {
+                    LawTypeId: data.active.Id,
+                    content: data.active.Content
+                }
+            });
             data.isAddShow = false,
                 ElNotification.success({
                     title: '已完成',
                     message: '添加成功',
                     offset: 100,
                 })
+            getUser();
         }
-        return { ...toRefs(data), dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
+        return { ...toRefs(data), selectedLawType, selectLawType,Types, dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
     },
 });
 </script>
