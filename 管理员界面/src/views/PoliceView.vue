@@ -187,6 +187,7 @@ export default defineComponent({
         message: '删除成功',
         offset: 100,
       })
+      getUser()
     }
     const updateUser = async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -215,15 +216,14 @@ export default defineComponent({
         })
     }
     const addUser = async () => {
+      debugger
       data.list.push(data.active)
       data.isAddShow = false;
       let queryParams = '';
-      // 遍历 data.list 数组中的对象，并构建查询参数
-      for (const item of data.list) {
-        for (const key in item) {
-          if (Object.prototype.hasOwnProperty.call(item, key) && key !== 'Id' && key !== 'Role') {
-            queryParams += `&${key}=${encodeURIComponent(item[key as keyof typeof item] as string)}`;
-          }
+      const lastItem = data.list[data.list.length - 1];
+      for (const key in lastItem) {
+        if (Object.prototype.hasOwnProperty.call(lastItem, key) && key !== 'Id' && key !== 'Role') {
+          queryParams += `&${key}=${encodeURIComponent(lastItem[key as keyof typeof lastItem] as string)}`;
         }
       }
       let response;
@@ -239,6 +239,7 @@ export default defineComponent({
           message: '添加成功',
           offset: 100,
         })
+      getUser();
     }
     return { ...toRefs(data), DeleteUser, setJudgeAdd, addClick, addUser, onSubmit, EditUser, updateUser };
   },
