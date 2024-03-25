@@ -494,12 +494,13 @@ export default defineComponent({
             } catch (error) {
                 console.error(error);
             }
-            data.isAddShow = false,
+            // data.isAddShow = false,
                 ElNotification.success({
                     title: '已完成',
                     message: '添加成功',
                     offset: 100,
                 })
+            getCase();
         }
         return { ...toRefs(data), rollBack, content0, content1, AddCaseLaw, Check2, isCheck, SaveOrderTake, SaveOrderTake12, Check, Cancel,CancelCase,dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
     },
