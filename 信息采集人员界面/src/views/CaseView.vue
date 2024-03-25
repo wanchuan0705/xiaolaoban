@@ -110,7 +110,7 @@
             </span>
         </template>
     </el-dialog>
-    
+
     <el-dialog v-model="isCancelShow" title="撤销案件">
         <el-form :model="active">
             <el-form-item label="原因" label-width="50px">
@@ -119,7 +119,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="addUser"><el-icon><Select /></el-icon>确认</el-button>
+                <el-button @click="CancelCase"><el-icon><Select /></el-icon>确认</el-button>
                 <el-button type="primary" @click="isAddShow = false">取消</el-button>
             </span>
         </template>
@@ -227,7 +227,6 @@ export default defineComponent({
             data.active.Id = row.Id;
         };
         const CancelCase = async () => {
-            
             const obj = {
                 id: data.active.Id,
                 content: data.active.Content
