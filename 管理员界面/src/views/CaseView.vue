@@ -17,11 +17,6 @@
             <el-form-item>
                 <el-button type="primary" @click="onSubmit" icon="search">查询</el-button>
             </el-form-item>
-            <!-- <el-form-item>
-                <el-button type="primary" @click="addClick"><el-icon>
-                        <CirclePlus />
-                    </el-icon>新增</el-button>
-            </el-form-item> -->
         </el-form>
         <el-table :data="dataList.comList" border style="width: 100%">
             <el-table-column label="操作">
@@ -67,7 +62,16 @@
                 <el-input v-model="active.Details" autocomplete="off" />
             </el-form-item>
             <el-form-item label="Types" label-width="50px">
-                <el-input v-model="active.Types" autocomplete="off" />
+                <el-dropdown size="large" split-button type="primary">
+                    <span>{{ active.Types }}</span> <!-- 显示当前选中的法律类型的名称 -->
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item v-for="type in Types" :key="type.Id" @click="selectLawType(type)">
+                                {{ type.Name }}
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </el-form-item>
             <el-form-item label="Platenumber" label-width="50px">
                 <el-input v-model="active.Platenumber" autocomplete="off" />
@@ -131,77 +135,86 @@
     </el-dialog>
     <el-dialog v-model="isShow" title="编辑信息">
         <el-form :model="active">
-            <el-form-item label="Address" label-width="50px">
-                <el-input v-model="active.Address" autocomplete="off" />
+            // <el-form-item label="Address" label-width="50px">
+                // <el-input v-model="active.Address" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="Details" label-width="50px">
+                // <el-input v-model="active.Details" autocomplete="off" />
+                // </el-form-item>
+            <el-form-item label="法律类型" label-width="100px">
+                <el-dropdown size="large" split-button type="primary">
+                    <span>{{ selectedLawType.Name }}</span> <!-- 显示当前选中的法律类型的名称 -->
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item v-for="type in Types" :key="type.Id" @click="selectLawType(type)">
+                                {{ type.Name }}
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </el-form-item>
-            <el-form-item label="Details" label-width="50px">
-                <el-input v-model="active.Details" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Types" label-width="50px">
-                <el-input v-model="active.Types" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Platenumber" label-width="50px">
-                <el-input v-model="active.Platenumber" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Date" label-width="50px">
-                <el-input v-model="active.Date" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Phone" label-width="50px">
-                <el-input v-model="active.Phone" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Image" label-width="50px">
-                <el-input v-model="active.Image" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="PolicerName" label-width="50px">
-                <el-input v-model="active.PolicerName" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="State" label-width="50px">
-                <el-select v-model="active.State" placeholder="请选择状态" autocomplete="off">
-                    <el-option label="未审核" value="待受理"></el-option>
-                    <el-option label="已审核" value="待受理"></el-option>
-                    <el-option label="已立案" value="已驳回"></el-option>
-                    <el-option label="处理中" value="处理中"></el-option>
-                    <el-option label="已完成" value="已完结"></el-option>
-                    <el-option label="已结案" value="待受理"></el-option>
-                    <el-option label="已驳回" value="待受理"></el-option>
-                    <el-option label="不立案" value="待受理"></el-option>
-                    <el-option label="已撤销" value="待受理"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="ViolatorsName" label-width="50px">
-                <el-input v-model="active.ViolatorsName" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="ApplicationTime" label-width="50px">
-                <el-input v-model="active.ApplicationTime" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Description" label-width="50px">
-                <el-input v-model="active.Description" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Model" label-width="50px">
-                <el-input v-model="active.Model" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Judgment" label-width="50px">
-                <el-input v-model="active.Judgment" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="M_Content" label-width="50px">
-                <el-input v-model="active.M_Content" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Content" label-width="50px">
-                <el-input v-model="active.Content" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="PolicerName1" label-width="50px">
-                <el-input v-model="active.PolicerName1" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="ViolatorsPhone" label-width="50px">
-                <el-input v-model="active.ViolatorsPhone" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="OrderTake" label-width="50px">
-                <el-input v-model="active.OrderTake" autocomplete="off" />
-            </el-form-item>
+            // <el-form-item label="Platenumber" label-width="50px">
+                // <el-input v-model="active.Platenumber" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="Date" label-width="50px">
+                // <el-input v-model="active.Date" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="Phone" label-width="50px">
+                // <el-input v-model="active.Phone" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="Image" label-width="50px">
+                // <el-input v-model="active.Image" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="PolicerName" label-width="50px">
+                // <el-input v-model="active.PolicerName" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="State" label-width="50px">
+                // <el-select v-model="active.State" placeholder="请选择状态" autocomplete="off">
+                    // <el-option label="未审核" value="待受理"></el-option>
+                    // <el-option label="已审核" value="待受理"></el-option>
+                    // <el-option label="已立案" value="已驳回"></el-option>
+                    // <el-option label="处理中" value="处理中"></el-option>
+                    // <el-option label="已完成" value="已完结"></el-option>
+                    // <el-option label="已结案" value="待受理"></el-option>
+                    // <el-option label="已驳回" value="待受理"></el-option>
+                    // <el-option label="不立案" value="待受理"></el-option>
+                    // <el-option label="已撤销" value="待受理"></el-option>
+                    // </el-select>
+                // </el-form-item>
+            // <el-form-item label="ViolatorsName" label-width="50px">
+                // <el-input v-model="active.ViolatorsName" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="ApplicationTime" label-width="50px">
+                // <el-input v-model="active.ApplicationTime" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="Description" label-width="50px">
+                // <el-input v-model="active.Description" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="Model" label-width="50px">
+                // <el-input v-model="active.Model" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="Judgment" label-width="50px">
+                // <el-input v-model="active.Judgment" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="M_Content" label-width="50px">
+                // <el-input v-model="active.M_Content" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="Content" label-width="50px">
+                // <el-input v-model="active.Content" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="PolicerName1" label-width="50px">
+                // <el-input v-model="active.PolicerName1" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="ViolatorsPhone" label-width="50px">
+                // <el-input v-model="active.ViolatorsPhone" autocomplete="off" />
+                // </el-form-item>
+            // <el-form-item label="OrderTake" label-width="50px">
+                // <el-input v-model="active.OrderTake" autocomplete="off" />
+                // </el-form-item>
 
-            <el-form-item label="LegalArticles" label-width="50px">
-                <el-input v-model="active.LegalArticles" autocomplete="off" />
-            </el-form-item>
+            // <el-form-item label="LegalArticles" label-width="50px">
+                // <el-input v-model="active.LegalArticles" autocomplete="off" />
+                // </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -215,11 +228,13 @@
 <script lang="ts">
 import axios from "axios";
 import { ElNotification } from "element-plus";
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from "vue";
 import { InitData, ListInt } from "../type/case";
 export default defineComponent({
     setup() {
         const data = reactive(new InitData());
+        const Types = ref([{ Id: 0, Name: '' }]); // 存储从接口获取的法律类型数据
+        const selectedLawType = ref({ Id: 0, Name: data.active.Types }); // 存储当前选中的法律类型
         onMounted(() => {
             getCase();
         });
@@ -306,7 +321,13 @@ export default defineComponent({
                 getCase();
             }
         });
-        const changeUser = (row: ListInt) => {
+        const selectLawType = (type: { Id: number; Name: string; }) => {
+            selectedLawType.value = type; // 更新当前选中的法律类型
+            // data.active.Id = type.Id; // 更新 active 对象中的 Id
+        };
+        const changeUser = async (row: ListInt) => {
+            const resTypes = await axios.get('http://localhost:5172/api/Admin/GetLawType');
+            Types.value = resTypes.data; // 将获取到的数据存储到 resTypes 中
             console.log(row);
             data.active = {
                 CaseNo: row.CaseNo,
@@ -383,7 +404,7 @@ export default defineComponent({
                     offset: 100,
                 })
         }
-        return { ...toRefs(data), dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
+        return { ...toRefs(data), selectedLawType,selectLawType, Types,dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
     },
 });
 </script>
