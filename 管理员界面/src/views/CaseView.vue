@@ -202,9 +202,18 @@
             // <el-form-item label="Content" label-width="50px">
                 // <el-input v-model="active.Content" autocomplete="off" />
                 // </el-form-item>
-            // <el-form-item label="PolicerName1" label-width="50px">
-                // <el-input v-model="active.PolicerName1" autocomplete="off" />
-                // </el-form-item>
+            <el-form-item label="PolicerName1" label-width="50px">
+                <el-dropdown size="large" split-button type="primary">
+                    <span>{{ selectedPolicerName1.Name }}</span> <!-- 显示当前选中的法律类型的名称 -->
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item v-for="type in PolicerName1" :key="type.Id" @click="selectLawType(type)">
+                                {{ type.Name }}
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+            </el-form-item>
             // <el-form-item label="ViolatorsPhone" label-width="50px">
                 // <el-input v-model="active.ViolatorsPhone" autocomplete="off" />
                 // </el-form-item>
@@ -234,7 +243,9 @@ export default defineComponent({
     setup() {
         const data = reactive(new InitData());
         const Types = ref([{ Id: 0, Name: '' }]); // 存储从接口获取的法律类型数据
-        const selectedLawType = ref({ Id: 0, Name: data.active.Types }); // 存储当前选中的法律类型
+        const selectedLawType = ref({ Id: 0, Name: ""}); // 存储当前选中的法律类型
+        const PolicerName1 = ref([{ Id: 0, Name: '' }]); 
+        const selectedPolicerName1 = ref({ Id: 0, Name: ""}); 
         onMounted(() => {
             getCase();
         });
@@ -323,11 +334,15 @@ export default defineComponent({
         });
         const selectLawType = (type: { Id: number; Name: string; }) => {
             selectedLawType.value = type; // 更新当前选中的法律类型
-            // data.active.Id = type.Id; // 更新 active 对象中的 Id
+        };
+        const selectPolicerName1 = (type: { Id: number; Name: string; }) => {
+            selectedPolicerName1.value = type; // 更新当前选中的法律类型
         };
         const changeUser = async (row: ListInt) => {
             const resTypes = await axios.get('http://localhost:5172/api/Admin/GetLawType');
             Types.value = resTypes.data; // 将获取到的数据存储到 resTypes 中
+            const resPolicerName1 = await axios.get('http://localhost:5172/api/Admin/GetPolice');
+            PolicerName1.value = resPolicerName1.data; // 将获取到的数据存储到 resTypes 中
             console.log(row);
             data.active = {
                 CaseNo: row.CaseNo,
@@ -354,6 +369,8 @@ export default defineComponent({
                 LegalArticles: row.LegalArticles // 补充 LegalArticles
 
             }
+            selectedLawType.value.Name = data.active.Types,
+            selectedPolicerName1.value.Name = data.active.PolicerName1,
             data.isShow = true
 
         }
@@ -404,7 +421,7 @@ export default defineComponent({
                     offset: 100,
                 })
         }
-        return { ...toRefs(data), selectedLawType,selectLawType, Types,dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
+        return { ...toRefs(data), selectPolicerName1, selectedPolicerName1,PolicerName1 ,selectedLawType,selectLawType, Types,dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
     },
 });
 </script>
