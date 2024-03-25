@@ -3,15 +3,15 @@
         <el-form :inline="true" :model="selectData" class="demo-form-inline">
             <el-form-item label="状态">
                 <el-select v-model="selectData.status" placeholder="请选择状态" :style="{ width: '200px' }" clearable>
-                    <el-option label="未审核" value="待受理"></el-option>
-                    <el-option label="已审核" value="待受理"></el-option>
-                    <el-option label="已立案" value="已驳回"></el-option>
+                    <el-option label="未审核" value="未审核"></el-option>
+                    <el-option label="已审核" value="已审核"></el-option>
+                    <el-option label="已立案" value="已立案"></el-option>
                     <el-option label="处理中" value="处理中"></el-option>
-                    <el-option label="已完成" value="已完结"></el-option>
-                    <el-option label="已结案" value="待受理"></el-option>
-                    <el-option label="已驳回" value="待受理"></el-option>
-                    <el-option label="不立案" value="待受理"></el-option>
-                    <el-option label="已撤销" value="待受理"></el-option>
+                    <el-option label="已完成" value="已完成"></el-option>
+                    <el-option label="已结案" value="已结案"></el-option>
+                    <el-option label="已驳回" value="已驳回"></el-option>
+                    <el-option label="不立案" value="不立案"></el-option>
+                    <el-option label="已撤销" value="已撤销"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item>
