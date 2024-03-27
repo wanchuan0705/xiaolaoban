@@ -297,7 +297,7 @@ namespace OverloadControl.Controllers
                     {
                         Directory.CreateDirectory(filePath);
                     }
-                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite))
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         file.CopyTo(fileStream);
                     }
