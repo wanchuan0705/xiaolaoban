@@ -86,8 +86,15 @@
                 <el-date-picker v-model="active.Date" type="datetime" placeholder="Select date and time"
                     value-format="yyyy-MM-dd HH:mm:ss" :editable="false" />
             </el-form-item> -->
-            <el-form-item label="Image" label-width="50px">
+            <el-form-item label="图片" label-width="50px">
                 <el-input v-model="active.Image" autocomplete="off" />
+                <el-upload class="avatar-uploader" action="http://localhost:5172/api/Gather/LOADIMAGE?name=aaa123"
+                    :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                    <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                    <el-icon v-else class="avatar-uploader-icon">
+                        <Plus />
+                    </el-icon>
+                </el-upload>
             </el-form-item>
             <el-form-item label="Description" label-width="50px">
                 <el-input v-model="active.Description" autocomplete="off" />
@@ -129,12 +136,13 @@
 <script lang="ts">
 import axios from "axios";
 import { ElNotification } from "element-plus";
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from "vue";
 import { InitData, ListInt } from "../type/case";
 import { loginStore } from "@/stores/login";
 export default defineComponent({
     setup() {
         const data = reactive(new InitData());
+        const imageUrl = ref("");
         onMounted(() => {
             getCase();
         });
@@ -345,7 +353,13 @@ export default defineComponent({
                     offset: 100,
                 })
         }
-        return { ...toRefs(data), Cancel,CancelCase,dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
+        const handleAvatarSuccess = (res: any, file: any) => {
+            imageUrl.value = URL.createObjectURL(file.raw);
+        }
+        const beforeAvatarUpload = ()=>{
+
+        }
+        return { ...toRefs(data), beforeAvatarUpload, imageUrl,handleAvatarSuccess, Cancel,CancelCase,dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
     },
 });
 </script>

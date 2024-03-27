@@ -275,5 +275,37 @@ namespace OverloadControl.Controllers
 
             return returnCaseList;
         }
+
+        #region 图片上传与显示
+
+        /// <summary>
+        /// 图片上传
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public string LOADIMAGE()
+        {
+            string filePath = null;
+            var files = Request.Form.Files;
+            string webRootPath = AppContext.BaseDirectory;
+            foreach (var file in files)
+            {
+                if (file.Length > 0)
+                {
+                    filePath = Path.Combine(webRootPath, "Images");
+                    if (!Directory.Exists(filePath))
+                    {
+                        Directory.CreateDirectory(filePath);
+                    }
+                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                }
+            }
+            return filePath;
+        }
+
+        #endregion 图片上传与显示
     }
 }
