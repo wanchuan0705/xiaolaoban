@@ -287,22 +287,32 @@ namespace OverloadControl.Controllers
         {
             string filePath = null;
             var files = Request.Form.Files;
-            string webRootPath = AppContext.BaseDirectory;
+
+            // 获取桌面路径
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
             foreach (var file in files)
             {
                 if (file.Length > 0)
                 {
-                    filePath = Path.Combine(webRootPath, "Images");
-                    if (!Directory.Exists(filePath))
+                    // 拼接文件保存路径
+                    filePath = Path.Combine(desktopPath, "image", file.FileName);
+
+                    // 创建文件夹
+                    string directoryPath = Path.GetDirectoryName(filePath);
+                    if (!Directory.Exists(directoryPath))
                     {
-                        Directory.CreateDirectory(filePath);
+                        Directory.CreateDirectory(directoryPath);
                     }
+
+                    // 将文件保存到指定路径
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         file.CopyTo(fileStream);
                     }
                 }
             }
+
             return filePath;
         }
 

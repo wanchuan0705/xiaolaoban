@@ -356,7 +356,7 @@ export default defineComponent({
         const handleAvatarSuccess = (res: any, file: any) => {
             imageUrl.value = URL.createObjectURL(file.raw);
         }
-        const beforeAvatarUpload = ()=>{
+        const beforeAvatarUpload = (file:any)=>{
 
         }
         return { ...toRefs(data), beforeAvatarUpload, imageUrl,handleAvatarSuccess, Cancel,CancelCase,dataList, currentChange, sizeChange, addClick, addUser, onSubmit, changeUser, updateUser };
